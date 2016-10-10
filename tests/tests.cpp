@@ -20,9 +20,8 @@ TEST(DNAFileTest, WrongLettersInFile)
 
 TEST(DNAFileTest, WrongFileFormat)
 {
-	ASSERT_DEATH(DNA(bad_dna_wrongFormat01.txt), "Error: wrong file format");
-	ASSERT_DEATH(DNA(bad_dna_wrongFormat02.jpeg), "Error: wrong file format");
-	ASSERT_DEATH(DNA(bad_dna_wrongFormat03.pdf), "Error: wrong file format");
+	ASSERT_DEATH(DNA(bad_dna_wrongFormat01.jpeg), "Error: wrong file format");
+	ASSERT_DEATH(DNA(bad_dna_wrongFormat02.pdf), "Error: wrong file format");
 }
 
 TEST(DNAFileTest, WrongFileStructure)
@@ -30,6 +29,11 @@ TEST(DNAFileTest, WrongFileStructure)
 	ASSERT_DEATH(DNA(bad_dna_wrongStructure01.fasta), "Error: bad file structure");
 	ASSERT_DEATH(DNA(bad_dna_wrongStructure02.fasta), "Error: bad file structure");
 	ASSERT_DEATH(DNA(bad_dna_wrongStructure03.fasta), "Error: bad file structure");
+}
+
+TEST(DNAFileTest, DataMetaDataMismatch)
+{
+	ASSERT_DEATH(DNA(bad_dna_DMDMismatch01.fasta), "Error: unexpected number of base pairs");
 }
 
 class DNAReloadFromNewFileTest : public ::testing::Test
@@ -88,9 +92,9 @@ TEST(PWMFileTest, badValues)
 
 TEST(PWMFileTest, badFileFormat)
 {
-	ASSERT_DEATH(PWM(bad_pwm_badFileFormat01.mat), "Error: bad file");
-	ASSERT_DEATH(PWM(bad_pwm_badFileFormat02.mat), "Error: bad file");
-	ASSERT_DEATH(PWM(bad_pwm_badFileFormat03.mat), "Error: bad file");
+	ASSERT_DEATH(PWM(bad_pwm_badFileFormat01.pdf), "Error: bad file");
+	ASSERT_DEATH(PWM(bad_pwm_badFileFormat02.jpeg), "Error: bad file");
+	ASSERT_DEATH(PWM(bad_pwm_badFileFormat03.png), "Error: bad file");
 }
 
 TEST(PWMFileTest, badFileStructure)
@@ -98,6 +102,12 @@ TEST(PWMFileTest, badFileStructure)
 	ASSERT_DEATH(PWM(bad_pwm_badFileStructure01.mat), "Error: bad file");
 	ASSERT_DEATH(PWM(bad_pwm_badFileStructure02.mat), "Error: bad file");
 	ASSERT_DEATH(PWM(bad_pwm_badFileStructure03.mat), "Error: bad file");
+}
+
+int main(int argc, char argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
 
 
