@@ -1,17 +1,5 @@
-CC=g++
-CFLAGS=-c -Wall
-LDFLAGS=
-SOURCES=main.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=../bin/out
-
-all: $(SOURCES) $(EXECUTABLE)
-	
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
-
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
-	
-clean:
-	rm -rf *.o
+cmake_minimum_required(VERSION 2.6)
+project(genom-4 CXX C)
+set(CMAKE_CXX_FLAGS "-W -Wall -pedantic -std=c++11")
+add_executable(../bin/exec.out src/main.cpp)
+target_link_libraries(../bin/exec.out m)
