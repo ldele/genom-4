@@ -5,7 +5,7 @@ add_executable(../bin/exec.out src/main.cpp)
 target_link_libraries(../bin/exec.out m)
 
 find_package(Doxygen)
-add_custom_target(inputFiles
+add_custom_target(doc
 	${Doxygen_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Doxyfile
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen"
