@@ -27,7 +27,7 @@ public:
      /*!
      * Function 2
      * Param StartPos as first argument
-     * Param length as second argument
+     * Param length of the DNA sequence as second argument
      */
     string returnSeg (unsigned int StartPos, unsigned int length);
     
@@ -36,9 +36,10 @@ private:
 
 	//Vérifie s'il n'y a que des bases (ATGC) dans la séquence d'ADN
 	 /*!
-     * Check
+     * Private function
+     * Check DNA file
      */
-	bool checkDNAString ();
+	bool checkDNAString();
 	
 	//Attributs
 	int size; /*!< Size of the DNA strand */
