@@ -13,13 +13,13 @@ public:
     /*!
      * Constructeur par défaut
      */
-    DNA (string filename);
+    DNA (std::string filename);
 
      /*!
      * Function 1
      * Ouvre un fichier et le lit
      */
-    void openFromFile (string filename);
+    void openFromFile (std::string filename);
     
      /*!
      * Function 2
@@ -27,7 +27,7 @@ public:
      * Param length of the DNA sequence as second argument
      * Retourne un segement avec une position de départ et une longeur donnée
      */
-    string returnSeg (unsigned int StartPos, unsigned int length);
+    std::string returnSeg (unsigned int StartPos, unsigned int length);
     
     
 private:
@@ -36,11 +36,11 @@ private:
      * Private function
      * Check DNA file - Vérifie s'il n'y a que des bases (ATGC) dans la séquence d'ADN
      */
-	bool checkDNAString();
+	bool checkDNAString(std::string);
 	
 	//Attributs
 	int size; /*!< Size of the DNA strand */
-	string mDNAseq; /*!< Sequence of the DNA */
+	std::string mDNAseq; /*!< Sequence of the DNA */
 	
 };
 
