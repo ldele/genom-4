@@ -1,21 +1,34 @@
-#ifdef PWM_HPP
+#ifndef PWM_HPP
 #define PWM_HPP
 
 #include <vector>
 #include <string>
 
+/*! PWM class */
+
 class PWM
 {
 public:
-
-	//constructeur de PWM
+	/*!
+     * Constructeur par défaut
+     */
 	PWM(string filename); 
 	
-	//fonction qui lit le fichier
+	/*!
+     * Function 1
+     * Ouvre un fichier et le lit
+     */
 	void openFromFile (string filename); 
 	
 	
 private:
+<<<<<<< HEAD
+	/*!
+     * Private function
+     * Check PWM file - Vérification de la matrice
+     */
+	void checkPWM();
+=======
 
 	//check si c'est la valeur introduite est une lettre
 	void checkLetter (double score);
@@ -28,8 +41,10 @@ private:
 	
 	//check si la somme des valeurs d'une ligne de PWM est = 1
 	void checkLigne();
+>>>>>>> 547f0b7c1e0a1497f74161b67b117e7ad5593bf1
 		
-	// matrice de score
-	vector<vector<double>> mPWM;  
+	vector<vector<double>> mPWM; /*!< Matrice du score */
 
-}
+};
+
+#endif
