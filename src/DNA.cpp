@@ -1,17 +1,39 @@
 #include "DNA.hpp"
 #include <string>
+#include <fstream>
 
 
-DNA::DNA (std::string filename)
+DNA::DNA (const char*  filename)
 {
     openFromFile(filename);
 }
 
 
-void DNA::openFromFile (std::string filename){
-	
-}
+void DNA::openFromFile(const char* filename)
+{
+    /* Méthode à revoir car utilisation de vector de char au lieu de string
+     * 
+    std::string tmp;  						// variable temporaire
+    std::ifstream lecture (filename);
+    
+    if (lecture.fail()) 
+    {
+        throw std::string("Error: File cannot be open !");
+    }
+
+      do 
+    {
+       lecture >> tmp;
+       infoSeq.push_back(tmp);    	//infoSeq est un vector de string;
+       lecture >> std::ws >> tmp;  // DNASeq est un vector de string;
+       DNASeq.push_back(tmp);
+    } while (!lecture.eof());
    
+    lecture.close();
+    */
+    
+}
+
 
 std::string DNA::returnSeg (unsigned int startpos, unsigned int lenght ){
 

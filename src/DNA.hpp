@@ -13,13 +13,13 @@ public:
     /*!
      * Constructeur par défaut
      */
-    DNA (std::string filename);
+    DNA (const char* Filename);
 
      /*!
      * Function 1
      * Ouvre un fichier et le lit
      */
-    void openFromFile (std::string filename);
+    void openFromFile (const char* filename);
     
      /*!
      * Function 2
