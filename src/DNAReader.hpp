@@ -3,6 +3,8 @@
 
 #include <string>
 #include <fstream>
+#include <regex>
+
 class DNA
 {
 public:
@@ -11,11 +13,15 @@ public:
 
 	void push_back(std::string base);
 	void pop_front();
+    void reset();
+    
+    std::string forward() const { return mFwd; }
+    std::string reverse() const { return mRv; }
 
 private:
 	std::string mFwd;
 	std::string mRv;
-}
+};
 
 class DNAReader
 {
@@ -23,7 +29,7 @@ public:
 	DNAReader(unsigned int readFrame) : mReadFrame(readFrame) {}
 	virtual ~DNAReader();
 
-	bool openFile(std::string filename); // returns true if file succesfully opened
+	void openFile(std::string filename);
 
 	void next(); // throws an error if no next base
 	void nextDNA(); // throws an error if no next DNA strand
@@ -40,7 +46,9 @@ public:
 		if(readingDNA()) return mCurrentBase; 
 		else return 0;
 	}
+	int currentReadFrame() const { return mReadFrame; }
 private:
+    bool mEOF;
 	unsigned int mReadFrame;
 
 	unsigned int mCurrentDNAChr;
@@ -49,17 +57,18 @@ private:
 	unsigned int mCurrentDNASize;
 	unsigned int mCurrentBase;
 
-	ifstream mFileStream;
+    std::ifstream mFileStream;
 	DNA mCurrentSegment;
 
 	bool mReadingDNA;
 
 	void checkFile(std::string filename) const;
-	bool getMetaData() const;
-	bool getFirstDNASeg() const;
+	void getMetaData();
+	void getFirstDNASeg();
 
-	void checkFormat(std::string s, std::regex r);
-	void checkFileStream();
-}
+	void checkFormat(std::string s, std::regex r) const;
+    void checkFormat(char* s, std::regex r) const;
+	void checkFileStream() const;
+};
 
 #endif /* DNA_READER_HPP */
