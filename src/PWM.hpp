@@ -3,6 +3,11 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <sstream>
+#include <stdexcept>
 
 /*! PWM class */
 
@@ -12,7 +17,7 @@ public:
 	/*!
      * Constructeur par défaut
      */
-	PWM(string filename); 
+	PWM(const char* filename); 
 	
 	/*!
      * Function 1
