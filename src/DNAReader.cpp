@@ -10,16 +10,16 @@ void DNA::push_back(std::string base)
 {
 	if(base.length() != 1) throw "\"DNA::push_back\": expected single nucleotide as argument";
 	mFwd += base;
-	if(base == "A") mRv += "T";
-	if(base == "T") mRv += "A";
-	if(base == "C") mRv += "G";
-	if(base == "G") mRv += "C";
+	if(base == "A") mRv = "T" + mRv;
+	if(base == "T") mRv = "A" + mRv;
+	if(base == "C") mRv = "G" + mRv;
+	if(base == "G") mRv = "C" + mRv;
 }
 
 void DNA::pop_front()
 {
 	mFwd.erase(0,1);
-	mRv.erase(0,1);
+    mRv.pop_back();
 }
 
 void DNA::reset()
