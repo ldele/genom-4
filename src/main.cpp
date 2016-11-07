@@ -1,13 +1,17 @@
 # include <iostream>
 # include "header.h"
+#include "PWM.hpp"
 
 // ------------- Declarations -------------
 
 // ------------- Main -------------
-int main(){
+int main()
+{
 	using namespace std;
 
-	std::cout << "Hello World" << std::endl;
+	//PWM mPWM("DBP_PPM.mat");
+	
+	cerr << "Hello World" << std::endl;
 
 	return 0;
 };
