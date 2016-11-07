@@ -1,5 +1,8 @@
 #include "DNAReader.hpp"
 
+#include <string>
+#include <sstream>
+#include <iostream>
 
 std::string _SOURCE_DIRECTORY_ = "/Users/FelixF/Desktop/DNAReader/";
 
@@ -55,8 +58,8 @@ void DNAReader::checkFile(std::string filename) const
 		std::string metaData;
 		getline(fileStream, metaData);
 
-		std::cout << metaData << std::endl;
-		std::cout << regex_match(metaData, r_metaData) << std::endl;
+		//std::cout << metaData << std::endl;
+		//std::cout << regex_match(metaData, r_metaData) << std::endl;
 
 		try{checkFormat(metaData, r_metaData);}
 		catch(std::string e) {throw "\"checkFile()\": " + std::string(e);}
@@ -66,14 +69,14 @@ void DNAReader::checkFile(std::string filename) const
 
 		//read the start base
 		std::istringstream ss(metaData);
-		ss.ignore(12, ':');
+		ss.ignore(13, ':');
 		getline(ss, start, '-');
 		int DNAStart = std::stoi(start);
-		std::cout << "Start: " << DNAStart << std::endl;
+		//std::cout << "Start: " << DNAStart << std::endl;
 		//read the end base
 		getline(ss, end, '\n');
 		int DNAEnd = std::stoi(end);
-		std::cout << "End: " << DNAEnd << std::endl;
+		//std::cout << "End: " << DNAEnd << std::endl;
 		//compute the length of the DNA sequence
 		int DNASize = DNAEnd - DNAStart;
 
@@ -142,7 +145,7 @@ void DNAReader::getFirstDNASeg()
 		char base[2];
 		std::regex r_DNABase("^[ACTG]$");
 		mFileStream.get(base,2);
-		std::cout << i << ": " << base << std::endl;
+		//std::cout << i << ": " << base << std::endl;
 		try{checkFormat(base, r_DNABase);}
 		catch(std::string e) {throw "\"getFirstDNASeg()\": " + std::string(e);}
 		mCurrentSegment.push_back(base);
@@ -171,11 +174,12 @@ void DNAReader::openFile(std::string filename)
 
 void DNAReader::next()
 {
+	/*
 	if(mFileStream.eof())
 	{
 		mEOF = true;
 		return;
-	}
+	}*/
 	try{checkFileStream();}
 	catch(std::string e) {throw "\"next()\": " + std::string(e);}
 
@@ -184,6 +188,8 @@ void DNAReader::next()
 	//get a single character
 	char s[2];
 	mFileStream.get(s,2);
+	
+	if(mFileStream.eof()) return;
 
 	if(!mFileStream.good() && !mFileStream.eof())
 	{
@@ -235,13 +241,24 @@ void DNAReader::nextDNA()
 
 bool DNAReader::endOfFile() const
 {
-	return mEOF;
+	return mFileStream.eof();
 }
 
 bool DNAReader::readingDNA() const
 {
 	return mReadingDNA;
 }
+
+DNA DNAReader::getCurrentSegment() const { return mCurrentSegment; }
+int DNAReader::currentChromosome() const { return mCurrentDNAChr; }
+int DNAReader::currentStartBase() const { return mCurrentDNAStart; }
+int DNAReader::currentEndBase() const { return mCurrentDNAEnd; }
+int DNAReader::currentDNASize() const { return mCurrentDNASize; }
+int DNAReader::currentBase() const { 
+		if(readingDNA()) return mCurrentBase; 
+		else return 0;
+}
+int DNAReader::currentReadFrame() const { return mReadFrame; }
 
 void DNAReader::checkFormat(std::string s, std::regex r) const
 {
