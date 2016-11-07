@@ -11,6 +11,8 @@
 
 /*! PWM class */
 
+using namespace std;
+
 class PWM
 {
 public:
@@ -23,14 +25,12 @@ public:
      * Function 1
      * Ouvre un fichier et le lit
      */
-	void openFromFile (string filename); 
+	void openFromFile (const char* filename); 
 	
 	
 private:
 
 	
-<<<<<<< HEAD
-=======
 
 	/*!
      * Private function
@@ -79,18 +79,14 @@ private:
      * Methode qui transforme la matrice PSSM a (PSSM - la constante (plus grande valeur de la matrice))
      */
 	void transfoPSSMC();
-	
-	
->>>>>>> 547f0b7c1e0a1497f74161b67b117e7ad5593bf1
-	
-		
-	vector<vector<double>> mPWM; /*!< Matrice du score */
-	
-	vector<vector<double>> mPPMC; /*!< Matrice obtenue en faisant PPM / la constante (plus grande valeur de la matrice) */
 
-	vector<vector<double>> mPSSM; /*!< Matrice obtenue en faisant log(PPM) */
+	vector<vector<double> > mPWM; /*!< Matrice du score */
 	
-	vector<vector<double>> mPSSMC; /*!< Matrice obtenue en faisant PSSM -la constante (plus grande valeur de la matrice) */
+	vector<vector<double> > mPPMC; /*!< Matrice obtenue en faisant PPM / la constante (plus grande valeur de la matrice) */
+
+	vector<vector<double> > mPSSM; /*!< Matrice obtenue en faisant log(PPM) */
+	
+	vector<vector<double> > mPSSMC; /*!< Matrice obtenue en faisant PSSM -la constante (plus grande valeur de la matrice) */
 
 };
 

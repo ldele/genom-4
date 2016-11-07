@@ -1,5 +1,7 @@
 #include "PWM.hpp"
+#include <iostream>
 
+using namespace std;
 
 //constructeur qui fait appel a la methode openfromfile
 PWM::PWM(const char* filename)
