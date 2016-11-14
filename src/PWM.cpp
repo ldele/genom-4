@@ -213,18 +213,12 @@ void PWM::transfoPPMC()
 			if (max <= mPWM[i][j]){
 				max = mPWM[i][j];
 			}
+		} 	if (max != 0.0){				//check pour ne pas avoir de division par 0.0
+			mPPMC[i][0] = mPWM[i][0]/max;
+			mPPMC[i][1] = mPWM[i][1]/max;
+			mPPMC[i][2] = mPWM[i][2]/max;
+			mPPMC[i][3] = mPWM[i][3]/max;
 		}
-	}
-
-	//check pour ne pas avoir de division par 0.0
-	if(max != 0.0){
-	
-		//on parcourt la matrice en la divisant par max
-		for (size_t i(0); i < mPWM.size(); ++i){
-			for (int j(0); j < 4 ; ++j){
-					mPPMC[i][j] = mPWM[i][j]/max;
-				}
-			}
 	}
 }
 
@@ -269,17 +263,11 @@ void PWM::transfoPSSMC()
 				{
 					max = mPWM[i][j];
 				}
+			} if(max != 0.0){							//check pour ne pas avoir de division par 0.0
+				mPSSMC[i][0] = mPWM[i][0]-max;
+				mPSSMC[i][1] = mPWM[i][1]-max;
+				mPSSMC[i][2] = mPWM[i][2]-max;
+				mPSSMC[i][3] = mPWM[i][3]-max;
 			}
-		}
-	
-	//check pour ne pas avoir de division par 0.0
-	if(max != 0.0){
-	
-	//on parcourt la matrice en la soustrayant par max
-	for (size_t i(0); i < mPWM.size(); ++i){
-		for (int j(0); j < 4 ; ++j){
-				mPSSMC[i][j] = mPWM[i][j]-max;
-			}
-		}
-	}
+	} 	
 }
