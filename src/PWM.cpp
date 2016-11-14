@@ -1,5 +1,6 @@
 #include "PWM.hpp"
 #include <iostream>
+#include <array>
 
 using namespace std;
 
@@ -78,7 +79,7 @@ void PWM::openFromFile (const char* filename)
 
 				  lecture.close();
 
-				  cout << " A                 T                 C                 G " << endl;
+				  cout << " A                 C                 G                 T " << endl;
 					
 				  for (size_t i(0); i < mPWM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
@@ -107,7 +108,7 @@ void PWM::openFromFile (const char* filename)
 
 					 lecture.close();
 
-				     cout << " A                 T                 C                 G " << endl;
+				     cout << " A                 C                 G                 T " << endl;
 				     
 					 for (size_t i(0); i < mPSSM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
@@ -271,3 +272,32 @@ void PWM::transfoPSSMC()
 			}
 	} 	
 }
+
+
+// Trouver consensus depuis la matrice
+std::string PWM::PWMToConsensus (vector<vector<double> > matrice)
+{
+	std::string consensus ("");
+	double MAX(0.0);
+	
+	array <std::string, 4> nuc = {"A", "C", "G", "T"}; // Tableau contenant les 4 nucléotides
+	int lettre;
+	
+	//recherche du maximum de la matrice et on stock la lettre correspondante
+	//NB: Quelque soit le type de matrice le score le plus élevé correspond toujours à la lettre la plus probable
+	for ( size_t i (0); i <  matrice.size(); ++i){
+		MAX = 0.0;
+		for ( int j (0); j < 4 ; ++j){
+			if (MAX <= matrice[i][j]){
+				MAX = matrice[i][j];
+				lettre = j;
+				}
+		} 
+		consensus += nuc[lettre];
+	}
+	std::cout << "CONSENSUS:   " << consensus << endl;
+	return consensus;
+}
+
+
+

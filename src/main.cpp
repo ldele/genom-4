@@ -8,7 +8,9 @@
 int main(){
 	using namespace std;
 	
-	PWM pwm("/home/INTRANET/mmach/myfiles/genom-4/inputFiles/DBP_PPM.mat");
+	PWM pwm("../inputFiles/DBP_PPM.mat");
+
+	pwm.PWMToConsensus(pwm.getmPWM ());
 
 	std::cout << "Hello World" << std::endl;
 

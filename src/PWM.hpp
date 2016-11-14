@@ -28,9 +28,12 @@ public:
 	void openFromFile (const char* filename); 
 	
 	
+	vector<vector<double> > getmPWM () {return mPWM;};
+	std::string PWMToConsensus (vector<vector<double> > matrice);
+
 private:
 
-	
+	  
 
 	/*!
      * Private function
