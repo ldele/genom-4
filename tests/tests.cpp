@@ -1,8 +1,32 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 //INCLUDE HEADER FILES!
 
+#include <string>
 
+#include "../src/SuperDNAReader.hpp"
+
+TEST(DNAReaderTest, CorrectOutput)
+{
+    std::string DNASeq("TCCAATCCACCCTCTGACTATTCCACATCCCATACCTCCTCCTCATCCCCTTGTCTCCATGAGGATTTCTCCACCCCACCAGCCCCCCACCCAACCAGACCAGTCTACTCCCTGGGGCCTCCAGTCTCTTGAGAGTTAGGTACTTCTTCTCTGATTAAAACAAGACCCAGTGGTCCTCTGCTGTATGTGTGTTGGGGACCTCATATCAGCTGGTGTATGCTGCCTGGCTAGTGGTTCAGTGTTTGAGAGATCTCGGGGGTCCAGGATAATTGAGAGAGCTGATCCTCTACAGGGTCATCTTCTTCTTCATTTTCTTCCAGCCTTTCTCTAATTTAACCACAGGGATCAGTAGCTTCTGTCCATTGGTTGGGTGCAAATATATTCCTCTGGTTTTATCAGC");
+    std::string Header(">chr7|chr7:113842207-113842607");
+    
+    SuperDNAReader MyReader;
+    DNA MyDNA = MyReader.start("/Users/FelixF/Education/EPFL/Programmation/genom-4/tests/dna_01.fasta");
+    std::string MySeq = MyDNA.mFwd;
+    std::string MyHeader = MyDNA.mHeader;
+    
+    EXPECT_EQ(MySeq, DNASeq);
+    EXPECT_EQ(MyHeader, Header);
+}
+
+int main(int argc, char ** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+
+/*
 //DNA file opening/integrity tests
 TEST(DNAFileTest, NumbersInFile)
 {
@@ -106,12 +130,8 @@ TEST(PWMFileTest, badFileStructure)
 	ASSERT_DEATH(PWM("bad_pwm_badFileStructure02.mat"), "Error: bad file");
 	ASSERT_DEATH(PWM("bad_pwm_badFileStructure03.mat"), "Error: bad file");
 }
+ */
 
-int main(int argc, char argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
 
 
 
