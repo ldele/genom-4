@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.1)
 project(genom-4 CXX C)
-set(CMAKE_CXX_FLAGS "-W -Wall -pedantic -std=c++11")
+set(CMAKE_CXX_FLAGS "-W -Wall -pedantic -std=c++11 -pthread“)
 
 enable_testing()
 include_directories(extlib/googletest/include extlib/googletest)
