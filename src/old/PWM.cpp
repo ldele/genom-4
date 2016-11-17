@@ -6,22 +6,14 @@
 using namespace std;
 
 //constructeur qui fait appel a la methode openfromfile
-PWM::PWM(const string& filename)
+PWM::PWM(const char* filename)
 {	
 	this->openFromFile(filename);	
 }
 
-double PWM::operator[](const size_t& pos)
-{
-    if (!mIsPPM) {
-    	return exp(mPWM[pos/4][pos%4]);
-    } else {
-    	return mPWM[pos/4][pos%4];
-    }
-}
 
 //lecture de la matrice, stockage en mémoire et tests
-void PWM::openFromFile (const string& filename)
+void PWM::openFromFile (const char* filename)
 { 
    if (checkLetter(filename) == false){
 	   cout <<"erreur" << endl;
@@ -63,7 +55,7 @@ void PWM::openFromFile (const string& filename)
 			read.close();
 					
 		   if(somme >=0.0){
-				  mIsPPM = true;
+					
 				  do{
 						double sommeligne (0.0);
 						mPWM.push_back(vector<double>());
@@ -88,7 +80,7 @@ void PWM::openFromFile (const string& filename)
 
 				  lecture.close();
 
-				cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
+				  cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
 					
 				  for (size_t i(0); i < mPWM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
@@ -99,7 +91,6 @@ void PWM::openFromFile (const string& filename)
 					 }
 			}
 			else{
-					mIsPPM = false;
 					 do{
 						  mPSSM.push_back(vector<double>());
 						  
@@ -118,7 +109,7 @@ void PWM::openFromFile (const string& filename)
 
 					 lecture.close();
 
-				      cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
+				     cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
 				     
 					 for (size_t i(0); i < mPSSM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
@@ -135,7 +126,7 @@ void PWM::openFromFile (const string& filename)
 
 //search is a test variable to search in file
 //in order to search the file filename must be open
-bool PWM::checkLetter (const string& filename){
+bool PWM::checkLetter (const char* filename){
 	
 	ifstream read;
 	string line;

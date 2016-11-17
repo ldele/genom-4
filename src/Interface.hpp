@@ -3,111 +3,113 @@
 
 #include "DNA.hpp"
 #include "PWM.hpp"
-
-/*!
- * External function
- * Convertit A, C, G, T en coordonnée dans PWM/colonne dans la matrice
- */
-size_t const convert(char const&);
-
-/*!
- * Struct (-> peut mieux faire...)
- * Tout ce qu'il faut savoir sur les séquences retenuent
- * Champ1 nom du brin, seq1 par défaut/j'ai fait comme s'il n'y avait qu'un brin sans >chr7|chr7:113842207-113842607 ou autre
- * Champ2 la séquence
- * Champ3 numéro de la premiere base de la séquence (place dans le brin)
- * Champ4 score de la séquence
- * Champ5 '+' si fwd ou '-' si Rev (-> peut mieux faire)
- */
-struct OutputSeqData
-{
-    std::string Strand = "seq1";
-    std::string Seq;
-    size_t Number;
-    double Score = 0.0;
-    char Fwd = '+';
-};
+#include "SeqData.hpp"
 
 /*! Interface class */
 class Interface
 {
 public:
-    /*!
-     * Constructeur
-     * A besoin du nom des fichiers
-     */
-    Interface(std::string const&, std::string const& = "output.fasta", std::string const& = "DBP_PPM.mat");
+	/*!
+	 * Constructor
+	 * param1 DNA filename, param2 Output filename, param3 PWM filename
+	 */
+    Interface(std::string const&, std::string const&, std::string const&);
 
-    /*!
-     * Public Function
-     * Change le fichier PWM
-     */
+	/*!
+	 * Function 1
+	 * param std::string (filename)
+	 * sets PWM
+	 */
     bool setPWM(std::string const&);
 
     /*!
-     * Public Function
-     * Change le fichier DNA
-     */
+	 * Function 2
+	 * param std::string (filename)
+	 * sets DNA
+	 */
     bool setDNA(std::string const&);
 
     /*!
-     * Public Function
-     * Change le fichier d'output
-     */
+	 * Function 3
+	 * param std::string (filename)
+	 * sets outputFile
+	 */
     bool setOut(std::string const&);
 
     /*!
-     * Public Function
-     * Change le seuil (-> cette fonction est mal pensée)
+     *  Function 4
+     *  param double
+     *  sets threshold (if you don't want the default one)
      */
     void setThreshold(double const&);
 
-    /*!
-     * Public Function
-     * Check si le fichier existe et s'il s'ouvre correctement. Flux d'entrée...
-     */
+	/*!
+	 *	Function 5
+	 *  param 1 std::string (filename), param 2 std::string (extension)
+	 *  checks extension and ifstream
+	 */
     bool checkIfFile(std::string const&, std::string const& = ".fasta") const;
 
     /*!
-     * Public Function
-     * Crée le fichier s'il n'existe pas. Check si c'est bien un .fasta
-     */
+	 *	Function 6
+	 *  param 1 std::string (filename), param 2 std::string (extension)
+	 *  checks extension and ofstream
+	 */
     bool checkOfFile(std::string const&, std::string const& = ".fasta") const;
 
-    /*!
-     * Public Function
-     * Si tout se passe bien, exécute le programme sinon ne fait rien.
-     * -> si les fichiers ont pu s'ouvrir et qu'il n'y a pas de soucis dans PWM et/ou DNA.
-     */
+	/*!
+	 *  Function 7
+	 *  no param
+	 *  calculates output from DNA and PWM
+	 */
     void output();
 
+    /*!
+     *  Function 8
+     *  param std::ostream&
+     *  prints output data (if stored in memory)
+     */
+    std::ostream& print(std::ostream&) const;
+
 private:
-    DNA mDNA; /*!< DNA */
-    PWM mPWM; /*!< PWM */
-    std::string mDNAFileN; /*!< Nom du fichier DNA */
-    std::string mPWMFileN; /*!< Nom du fichier PWM */
-    std::string mOutFileN; /*!< Nom du fichier de sortie (output) */
-    double threshold; /*!< Seuil, on ne garde que les sequences qui ont un score supérieur */
-    std::vector<OutputSeqData> mDNAandPWM; /*!< Enregistre l'output, voir OutputSeqData */
+    DNA mDNA; /*!< DNA fragments */
+    PWM mPWM; /*!< Matrix containing scores (and controls) */
+    std::string mDNAFileN; /*!< DNA filename */
+    std::string mPWMFileN; /*!< PWM filename */
+    std::string mOutFileN; /*!< Output filename */
+    double mThreshold; /*!< Threshold; minimum interesting dna fragment score */
+    std::vector<SeqData> mData;  /*!< Stored output data */
+    bool mSetThresh = false; /*!< Boolean, is true if we changed the threshold otherwise we use default value */
+
+	/*!
+	 * private function 1
+	 * no param
+	 * Check the streams of DNA, PWM and Output files
+	 */
+    void checkFiles() const;
 
     /*!
-     * Private function
-     * Check all files (PWM, DNA et Output)
+     * private function 2
+     * no param
+     * Read DNA and set the score calculation
      */
-    bool checkFiles() const;
+    void FromDNAandPWM();
 
     /*!
-     * Private function
-     * Aide la fonction Interface::output
+     * private function 3
+     * no param
+     * calculate the scores and stores output data
      */
-    bool FromDNAandPWM();
-
-    /*!
-     * Private function
-     * Aide Interface::FromDNAandPWM
-     */
-    void calcScore(OutputSeqData&, std::ofstream&);
+    void calcScore(SeqData&);
 };
+
+/*!
+ * Bonus function
+ * param 1 std::ostream&, param 2 Interface
+ * calls void Interface::print(std::ostream&)
+ * overloads '<<'
+ */
+std::ostream& operator<<(std::ostream&, Interface const&);
 
 #endif
 

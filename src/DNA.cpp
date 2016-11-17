@@ -1,55 +1,75 @@
 #include "DNA.hpp"
-#include <string>
-#include <fstream>
 
+#include <stdexcept>
 
-DNA::DNA (const char*  filename)
+void DNA::start(const std::string& filepath)
 {
-    openFromFile(filename);
+    mFileStream.close();
+	mFileStream.open(filepath);
+	mCPos = 0.0;
+    mHeader = "";
+    mFwd = "";
+    mRv = "";
 }
 
-
-void DNA::openFromFile(const char* filename)
+bool DNA::next(const size_t& p_size)
 {
-    /* Méthode à revoir car utilisation de vector de char au lieu de string
-     * 
-    std::string tmp;  						// variable temporaire
-    std::ifstream lecture (filename);
-    
-    if (lecture.fail()) 
-    {
-        throw std::string("Error: File cannot be open !");
+    char nChar;
+    mFileStream >> std::ws >> nChar;
+    if (nChar != '\0') ++mCPos;
+    if (nChar == '>') nextStrand(p_size);
+    else add(nChar);
+    mRv = "";
+    for(auto& base: mFwd) {
+        if(base == 'A') mRv = "T" + mRv;
+        if(base == 'T') mRv = "A" + mRv;
+        if(base == 'C') mRv = "G" + mRv;
+        if(base == 'G') mRv = "C" + mRv;
     }
-
-      do 
-    {
-       lecture >> tmp;
-       infoSeq.push_back(tmp);    	//infoSeq est un vector de string;
-       lecture >> std::ws >> tmp;  // DNASeq est un vector de string;
-       DNASeq.push_back(tmp);
-    } while (!lecture.eof());
-   
-    lecture.close();
-    */
-    
+    if (mFwd.length() != p_size) return false;
+    return true;
 }
 
-
-std::string DNA::returnSeg (unsigned int startpos, unsigned int lenght ){
-
-	return mDNAseq.substr(startpos, lenght);
-
-} 
-
-
-bool DNA::checkDNAString(std::string mDNAseq1){  		//methode permettant de lire la sequence et de controler 
-														//si cette dernière ne contient pas d'erreur
-	size_t found = mDNAseq1.find_first_not_of("ATGC");  //fonction qui retourne la position de la première lettre qui n'est pas un ATGC
-														//retourne string::npos si toutes les lettres sont ATGC
-	if (found!=std::string::npos) {
-		return false;
-		} else {
-			return true;
-		}
+void DNA::nextStrand(const size_t& p_size)
+{
+    mFileStream >> std::ws >> mHeader;
+    mCPos += mHeader.length();
+    mFwd = "";
+    getPartOfLine(p_size);
+    mCPos += mFwd.length();
 }
 
+void DNA::add(const char c)
+{
+    std::string str("");
+    str += c;
+    if (str.find_first_not_of("ACGTacgtNn.-") == std::string::npos) {
+        for (size_t i(1); i < mFwd.size(); ++i) {
+            mFwd[i-1] = mFwd[i];
+        }
+        mFwd.pop_back();
+        mFwd += str;
+    } else {
+        if (c != '\0') {
+            throw std::runtime_error(" Found invalid character: " + str + ", at position: " + std::to_string(mCPos));
+        }
+    }
+}
+
+bool DNA::eof()
+{
+	return mFileStream.eof();
+}
+
+std::istream& DNA::getPartOfLine(const size_t& p_size)
+{
+    for (char nChar('\0'); (mFwd.length() != p_size) and (!mFileStream.eof()); mFwd += nChar) {
+        mFileStream >> std::ws >> nChar;
+        if (nChar == '>') {
+            ++mCPos;
+            nextStrand(p_size);
+            return mFileStream;
+        }
+    }
+    return mFileStream;
+}

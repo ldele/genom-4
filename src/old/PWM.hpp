@@ -10,34 +10,26 @@
 #include <stdexcept>
 
 /*! PWM class */
+
 using namespace std;
 
 class PWM
 {
 public:
 	/*!
-	 * Constructeur par défaut
-	 */
-	PWM() = default;
-
-	/*!
-     * Constructeur
-     * param PWM filename
+     * Constructeur par défaut
      */
-	PWM(const std::string& filename); 
+	PWM(const char* filename); 
 	
 	/*!
      * Function 1
      * Ouvre un fichier et le lit
      */
-	void openFromFile (const std::string& filename); 
-
-	size_t size() const { return mPWM.size(); }
-    double operator[](const size_t&);
+	void openFromFile (const char* filename); 
 	
 	
-	vector<vector<double> > getmPWM () {return mPWM;}
-	std::string PWMToConsensus (vector<vector<double> >);
+	vector<vector<double> > getmPWM () {return mPWM;};
+	std::string PWMToConsensus (vector<vector<double> > matrice);
 
 private:
 
@@ -47,7 +39,7 @@ private:
      * Private function
      * Check si la valeur introduite est une lettre ou un caractère - Vérification de la matrice
      */
-	bool checkLetter(const std::string& filename);
+	bool checkLetter(const char* filename);
 	
 	/*!
      * Private function
@@ -98,8 +90,6 @@ private:
 	vector<vector<double> > mPSSM; /*!< Matrice obtenue en faisant log(PPM) */
 	
 	vector<vector<double> > mPSSMC; /*!< Matrice obtenue en faisant PSSM -la constante (plus grande valeur de la matrice) */
-
-	bool mIsPPM; /*!< True if PWM is PPM/PPMC and false if PWM is PSSM/PSSMC */
 
 };
 
