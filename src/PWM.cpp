@@ -1,6 +1,7 @@
 #include "PWM.hpp"
 #include <iostream>
 #include <array>
+#include <iomanip>
 
 using namespace std;
 
@@ -79,12 +80,12 @@ void PWM::openFromFile (const char* filename)
 
 				  lecture.close();
 
-				  cout << " A                 C                 G                 T " << endl;
+				  cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
 					
 				  for (size_t i(0); i < mPWM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
 							  
-							 cout << mPWM[i][j] << "      ";
+							 cout << left << setw(15) << mPWM[i][j];
 						 }
 						 cout << endl;
 					 }
@@ -108,12 +109,13 @@ void PWM::openFromFile (const char* filename)
 
 					 lecture.close();
 
-				     cout << " A                 C                 G                 T " << endl;
+				     cout << "A" << setw(15) << "C" << setw(15) << "G" << setw(15) << "T" << setw(15) << endl;
 				     
 					 for (size_t i(0); i < mPSSM.size(); ++i){
 						 for (size_t j(0); j < 4; ++j){
 							 
-							 cout << mPSSM[i][j] << "      ";
+							 cout << left << setw(15) << mPSSM[i][j];
+							 //cout << mPSSM[i][j] << "      ";
 						 }
 						 cout << endl;
 					}
