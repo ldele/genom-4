@@ -48,14 +48,14 @@ public:
 	 *  param 1 std::string (filename), param 2 std::string (extension)
 	 *  checks extension and ifstream
 	 */
-    bool checkIfFile(std::string const&, std::string const& = ".fasta") const;
+    static bool checkIfFile(std::string const&, std::string const& = ".fasta");
 
     /*!
 	 *	Function 6
 	 *  param 1 std::string (filename), param 2 std::string (extension)
 	 *  checks extension and ofstream
 	 */
-    bool checkOfFile(std::string const&, std::string const& = ".fasta") const;
+    static bool checkOfFile(std::string const&, std::string const& = ".fasta");
 
 	/*!
 	 *  Function 7

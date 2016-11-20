@@ -38,8 +38,9 @@ public:
      * Function 4
      * param std::ostream&
      * prints data
+     * overloads '<<'
      */
-    std::ostream& print(std::ostream&) const;
+    friend std::ostream& operator<<(std::ostream&, const SeqData&);
 
 private:
     std::string mSeq;  /*!< DNA frag. sequence */
@@ -50,13 +51,5 @@ private:
 public:
     double mScore;  /*!< DNA frag. score */
 };
-
-/*!
- * Bonus Function
- * param1 std::ostream&, param2 SeqData&
- * calls SeqData::print(std::ostream&)
- * overloads '<<'
- */
-std::ostream& operator<<(std::ostream&, const SeqData&);
 
 #endif // SeqData_hpp

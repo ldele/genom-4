@@ -88,6 +88,8 @@ private:
 	 * resets mFwd and reads a DNA fragment of PWM size in file
      */
     std::istream& getPartOfLine(const size_t&);
+
+    void checkSeq() const;
 };
 
 #endif //DNA_HPP

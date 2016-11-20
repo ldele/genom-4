@@ -15,9 +15,9 @@ char SeqData::fwd() const
     else return '-';
 }
 
-char SeqData::operator[](const size_t& p_b) const
+char SeqData::operator[](const size_t& pos) const
 {
-    return mSeq[p_b];
+    return mSeq[pos];
 }
 
 size_t SeqData::length() const
@@ -25,14 +25,8 @@ size_t SeqData::length() const
     return mSeq.length();
 }
 
-std::ostream& SeqData::print(std::ostream& p_out) const
+std::ostream& operator<<(std::ostream& out, const SeqData& sd)
 {
-    p_out << mStrand << " " << mPos << " " << fwd() << " " << mSeq << " " << mScore << std::endl;
-    return p_out;
-}
-
-std::ostream& operator<<(std::ostream& p_out, const SeqData& p_sd)
-{
-    p_sd.print(p_out);
-    return p_out;
+    out << sd.mStrand << " " << sd.mPos << " " << sd.fwd() << " " << sd.mSeq << " " << sd.mScore << std::endl;
+    return out;
 }

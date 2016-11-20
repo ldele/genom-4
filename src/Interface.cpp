@@ -6,9 +6,7 @@
 #include <stdexcept>
 
 Interface::Interface(std::string const& DNAfile, std::string const& Outfile, std::string const& PWMfile)
-:mDNA()
-,mPWM()
-,mDNAFileN(DNAfile)
+:mDNAFileN(DNAfile)
 ,mPWMFileN(PWMfile)
 ,mOutFileN(Outfile)
 {
@@ -16,13 +14,17 @@ Interface::Interface(std::string const& DNAfile, std::string const& Outfile, std
 
 void Interface::output()
 {
-    checkFiles();
-    mPWM.openFromFile(mPWMFileN);
-    FromDNAandPWM();
-    print(std::cout);
-    std::ofstream write(mOutFileN);
-  	print(write);
-    write.close();
+	try {
+	    checkFiles();
+	    mPWM.openFromFile(mPWMFileN);
+	    FromDNAandPWM();
+	    print(std::cout);
+	    std::ofstream write(mOutFileN);
+	  	print(write);
+	    write.close();
+	} catch (std::runtime_error error) {
+		std::cerr << error.what() << std::endl;
+	}
 }
 
 std::ostream& Interface::print(std::ostream& p_out) const
@@ -33,7 +35,7 @@ std::ostream& Interface::print(std::ostream& p_out) const
     return p_out;
 }
 
-bool Interface::checkIfFile(std::string const& filename, std::string const& extension) const
+bool Interface::checkIfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
     if ((!regex_match(filename, r_check) || (filename == extension))) return false;
@@ -43,7 +45,7 @@ bool Interface::checkIfFile(std::string const& filename, std::string const& exte
     return true;
 }
 
-bool Interface::checkOfFile(std::string const& filename, std::string const& extension) const
+bool Interface::checkOfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
     if ((!regex_match(filename, r_check) || (filename == extension))) return false;
@@ -102,7 +104,7 @@ void Interface::FromDNAandPWM()
     }
 }
 
-void Interface::calcScore(SeqData& p_sd)
+void Interface::calcScore(SeqData& sd)
 {
     typedef enum {A, C, G, T, N} nuc;
     std::map<char, nuc> char2nuc{{'A',A},{'a',A},
@@ -112,17 +114,17 @@ void Interface::calcScore(SeqData& p_sd)
                                  {'N',N},{'n',N},{'-',N},{'.',N}};
 
     for (size_t j(0); j < mPWM.size(); ++j) {
-        if(char2nuc[p_sd[j]] != 4) {
-            if (mPWM[j*4 + char2nuc[p_sd[j]]] == 0) {
-                p_sd.mScore += mThreshold;
+        if(char2nuc[sd[j]] != 4) {
+            if (mPWM[j*4 + char2nuc[sd[j]]] == 0) {
+                sd.mScore += mThreshold;
                 j = mPWM.size();
             } else {
-                p_sd.mScore += log(mPWM[j*4 + char2nuc[p_sd[j]]]);
+                sd.mScore += log(mPWM[j*4 + char2nuc[sd[j]]]);
             }
         }
     }
-    if (p_sd.mScore > mThreshold) {
-        mData.push_back(p_sd);
+    if (sd.mScore > mThreshold) {
+        mData.push_back(sd);
     }
 }
 
