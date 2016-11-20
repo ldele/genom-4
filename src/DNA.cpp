@@ -1,12 +1,12 @@
 #include "DNA.hpp"
 
+#include <iostream>
 #include <stdexcept>
 
 void DNA::start(const std::string& filepath)
 {
     mFileStream.close();
 	mFileStream.open(filepath);
-	mCPos = 0.0;
     mHeader = "";
     mFwd = "";
     mRv = "";
@@ -15,11 +15,10 @@ void DNA::start(const std::string& filepath)
 bool DNA::next(const size_t& size)
 {
     char nChar;
-    mFileStream >> std::ws >> nChar;
+    mFileStream >> nChar;
     if (nChar == '>') nextStrand(size);
     else add(nChar);
     
-    mCPos += mFwd.length();
     checkSeq();
     mRv = "";
     for(auto& base: mFwd) {
@@ -34,8 +33,7 @@ bool DNA::next(const size_t& size)
 
 void DNA::nextStrand(const size_t& size)
 {
-    mFileStream >> std::ws >> mHeader;
-    mCPos += mHeader.length() + 1;
+    mFileStream >> mHeader;
     mFwd = "";
     getPartOfLine(size);
 }
@@ -56,10 +54,10 @@ bool DNA::eof()
 	return mFileStream.eof();
 }
 
-std::istream& DNA::getPartOfLine(const size_t& size)
+newIfstream& DNA::getPartOfLine(const size_t& size)
 {
     for (char nChar('\0'); (mFwd.length() != size) and (!mFileStream.eof());) {
-        mFileStream >> std::ws >> nChar;
+        mFileStream >> nChar;
         if (nChar == '>') {
             nextStrand(size);
             return mFileStream;
@@ -73,6 +71,20 @@ void DNA::checkSeq() const
 {
 	size_t ePos = mFwd.find_first_not_of("ACGTacgtNn.-");
     if (ePos != std::string::npos) {
-    	throw std::runtime_error(" Found invalid character in: " + mFwd + ", at position: " + std::to_string(ePos + mCPos));
+    	throw std::runtime_error(" Found invalid character in: " + mFwd + ", at position: " + std::to_string(mFileStream.getCPos()));
     }
+}
+
+void newIfstream::open(const std::string& filename) 
+{
+    mFileStream.open(filename, std::ios::in);
+    mCPos = 0;
+}
+
+template<typename T>
+std::ifstream& operator>>(newIfstream& file, T& sth) 
+{
+    file.mFileStream >> std::ws >> sth;
+    ++file.mCPos;
+    return file.mFileStream;
 }

@@ -30,13 +30,29 @@ public:
 
     /*!
      * Function 3
+     * param double
+     * updates score
+     * overloads '+='
+     */
+    SeqData& operator+=(const double&);
+
+    /*!
+     * Function 4
+     * param double
+     * compares SeqData score with a double
+     * overloads '>'
+     */
+    bool operator>(const double&) const;
+
+    /*!
+     * Function 5
      * returns DNA seq. length
      */
     size_t length() const;
 
     /*!
-     * Function 4
-     * param std::ostream&
+     * Friend Function
+     * param1 std::ostream&, param2 const SeqData&
      * prints data
      * overloads '<<'
      */
@@ -47,8 +63,6 @@ private:
     size_t mPos;  /*!< DNA frag. number */
     std::string mStrand;  /*!< Header/DNA frag. name */
     bool mFwd;  /*!< True for fwd DNA frag., false for reverse */
-
-public:
     double mScore;  /*!< DNA frag. score */
 };
 

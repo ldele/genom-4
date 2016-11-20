@@ -116,14 +116,14 @@ void Interface::calcScore(SeqData& sd)
     for (size_t j(0); j < mPWM.size(); ++j) {
         if(char2nuc[sd[j]] != 4) {
             if (mPWM[j*4 + char2nuc[sd[j]]] == 0) {
-                sd.mScore += mThreshold;
+                sd += mThreshold;
                 j = mPWM.size();
             } else {
-                sd.mScore += log(mPWM[j*4 + char2nuc[sd[j]]]);
+                sd += log(mPWM[j*4 + char2nuc[sd[j]]]);
             }
         }
     }
-    if (sd.mScore > mThreshold) {
+    if (sd > mThreshold) {
         mData.push_back(sd);
     }
 }

@@ -4,6 +4,50 @@
 #include <string>
 #include <fstream>
 
+/*! newIfstream class */
+class newIfstream
+{
+	public:
+	/*!
+	 * Function1 
+	 * no param
+	 * gets current position in file
+	 */
+	unsigned long int getCPos() const { return mCPos; }
+
+	/*!
+	 * Function2
+	 * param const std::string& (filename)
+	 * modified std::ifstream::open
+	 */
+	void open(const std::string&);
+
+	/*!
+	 * Function3
+	 * calls std::ifstream::close()
+	 */
+	void close() { mFileStream.close(); }
+	
+	/*!
+	 * Function3
+	 * returns std::ifstream::eof()
+	 */
+	bool eof() { return mFileStream.eof(); }
+
+	/*!
+	 * Friend Function
+	 * param1 newIfstream&, param2 template
+	 * overloads '>>'
+	 * ++mCPos for each element read in file.
+	 */
+	template<typename T>
+	friend std::ifstream& operator>>(newIfstream&, T&);
+
+	private:
+	unsigned long int mCPos; /*!< current position in file */
+	std::ifstream mFileStream; /*!< DNA filestream */
+};
+
 /*! DNA class */
 class DNA
 {
@@ -64,8 +108,7 @@ private:
 	std::string mHeader; /*!< Header/strand name */
 	std::string mFwd; /*!< Forward DNA fragment */
 	std::string mRv; /*!< Reverse DNA fragment */
-    std::ifstream mFileStream; /*!< DNA file stream */
-    unsigned long int mCPos; /*!< Current position in the file */
+	newIfstream mFileStream; /*!< modified std::ifstream */
 
 	/*!
 	 * Private function 1
@@ -87,7 +130,7 @@ private:
 	 * param const size_t& (size of PWM)
 	 * resets mFwd and reads a DNA fragment of PWM size in file
      */
-    std::istream& getPartOfLine(const size_t&);
+    newIfstream& getPartOfLine(const size_t&);
 
     void checkSeq() const;
 };
