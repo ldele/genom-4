@@ -188,6 +188,7 @@ void PWM::checkscorePWM(double score){
 	}							
 }
 
+
 //checker si le log est compris entre -infini et 0 (car proba sont comprises entre 0 et 1)
 void PWM::checkscorePSSM(double score){
 	
@@ -198,7 +199,7 @@ void PWM::checkscorePSSM(double score){
 	}	
 	catch(string const& erreur){
 		cerr<< "Erreur : " <<erreur<<endl;
-		}		
+	}		
 }
 
 //checker si sur la ligne la somme des valeurs vaut 0
@@ -220,67 +221,73 @@ void PWM::transfoPPMC()
 	double max(0.0);
 		
 	//recherche du maximum de la matrice PWM et on la stock
-	for ( size_t i (0); i <  mPWM.size(); ++i){
+	for (size_t i(0); i < mPWM.size(); ++i){
 		for ( int j (0); j < 4 ; ++j){
-			if (max <= mPWM[i][j]){
-				max = mPWM[i][j];
-			}
-		} 	if (max != 0.0){				//check pour ne pas avoir de division par 0.0
-			mPPMC[i][0] = mPWM[i][0]/max;
-			mPPMC[i][1] = mPWM[i][1]/max;
-			mPPMC[i][2] = mPWM[i][2]/max;
-			mPPMC[i][3] = mPWM[i][3]/max;
+				if (max <= mPWM[i][j]){
+					max = mPWM[i][j];
+				}
+			}			
+		if (max != 0.0){//check pour ne pas avoir de division par 0.0				
+				mPPMC[i][0] = mPWM[i][0]/max;
+				mPPMC[i][1] = mPWM[i][1]/max;
+				mPPMC[i][2] = mPWM[i][2]/max;
+				mPPMC[i][3] = mPWM[i][3]/max;		
 		}
+		else{
+			cout<< "erreur : division par 0 dans PMMC"<<endl;
+		}
+		max= 0.0;
 	}
 }
 
 //methode qui transforme la matrice PPM a log(PPM)
+//on donne un seuil (-99.8) pour le calcul de log si la propbabilité vaut 0
 void PWM::transfoPSSM()
 {
 	for (size_t i (0); i < mPWM.size() ; ++i){
 		for (int j (0); j < 4 ; ++j){
-			if(mPWM[i][j] == 0.0){
-				mPSSM[i][j] = -99.8;
-			}
-			else{
-				mPSSM[i][j] = log(mPWM[i][j]);
-			}
+			
+				if(mPWM[i][j] == 0.0){
+					mPSSM[i][j] = -99.8;
+				}
+				else{
+					mPSSM[i][j] = log2(mPWM[i][j]);
+				}
 		}
 	}
 }
 
-//methode qui transforme la matrice PSSM a exp(PSSM)
+//methode qui transforme la matrice PSSM a exp(PSSM)=PWM
 void PWM::transfoPPM()
 {
-	//on parcourt la matrice en prenant l'exponentielle
-	for (size_t i (0); i < mPWM.size(); ++i){
+	//on parcourt la matrice en prenant la puissance 2^x 
+	for (size_t i (0); i < mPSSM.size() ; ++i){
 		for (int j (0); j < 4 ; ++j){
-				mPSSM[i][j] = exp(mPWM[i][j]);
-				cout << mPSSM[i][j] << "  ";
+				mPWM[i][j] = exp2(mPSSM[i][j]);
 			}
-			cout << endl;
 		}
 }
 
 //methode qui transforme la matrice PSSM a (PSSM - la constante (plus grande valeur de la matrice))
 void PWM::transfoPSSMC()
 {
-	
-	double max(-10);
+	double max(-99.8);
 		
 	//recherche du maximum de la matrice PSSM et on la stock
-	for ( size_t i (0); i <  mPWM.size(); ++i){
+	for (size_t i(0); i < mPSSM.size(); ++i){
 		for ( int j (0) ; j < 4 ; ++j){
-				if (max <= mPWM[i][j])
-				{
-					max = mPWM[i][j];
-				}
-			} if(max != 0.0){							//check pour ne pas avoir de division par 0.0
-				mPSSMC[i][0] = mPWM[i][0]-max;
-				mPSSMC[i][1] = mPWM[i][1]-max;
-				mPSSMC[i][2] = mPWM[i][2]-max;
-				mPSSMC[i][3] = mPWM[i][3]-max;
-			}
+			
+				if (max <= mPSSM[i][j]){
+						max = mPSSM[i][j];
+				}	
+		}
+	
+		mPSSMC[i][0] = mPSSM[i][0]-max;
+		mPSSMC[i][1] = mPSSM[i][1]-max;
+		mPSSMC[i][2] = mPSSM[i][2]-max;
+		mPSSMC[i][3] = mPSSM[i][3]-max;
+	
+	    max=-99.8;   
 	} 	
 }
 
