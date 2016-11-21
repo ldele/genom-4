@@ -1,20 +1,9 @@
-# include <iostream>
-# include "header.h"
-# include "PWM.hpp"
+#include <iostream>
+#include "Interface.hpp"
 
-// ------------- Declarations -------------
-
-// ------------- Main -------------
-int main(){
-	using namespace std;
-	
-	PWM pwm("../inputFiles/DBP_PPM.mat");
-
-	pwm.PWMToConsensus(pwm.getmPWM ());
-
-	std::cout << "Hello World" << std::endl;
-
+int main()
+{
+    Interface App1("../inputFiles/promoters.fasta", "../outputFiles/output.fasta", "../inputFiles/DBP_PPM.mat");
+    App1.output();
 	return 0;
 }
-
-// ------------- Functions -------------

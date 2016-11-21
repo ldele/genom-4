@@ -1,69 +1,56 @@
 #include "Interface.hpp"
-#include <regex>
 
-size_t const convert(char const& base)
-{
-    if (base == 'A') {  return 0; }
-    if (base == 'C') {  return 1; }
-    if (base == 'G') {  return 2; }
-    if (base == 'T') {  return 3; }
-    throw std::string("1 base != ACGT");
-    return 4; //!Will never return 4... (Definitive control is done in DNA?)
-}
+#include <regex>
+#include <map>
+#include <iostream>
+#include <stdexcept>
 
 Interface::Interface(std::string const& DNAfile, std::string const& Outfile, std::string const& PWMfile)
-:mDNA()
-,mPWM(PWMfile) //! Je ne veux pas lancer PWM::openFromFile dans le constructeur
-,mDNAFileN(DNAfile)
+:mDNAFileN(DNAfile)
 ,mPWMFileN(PWMfile)
 ,mOutFileN(Outfile)
 {
-    if (!checkFiles()) {
-        throw std::runtime_error("Interface badly initialized !");
-    }
 }
 
 void Interface::output()
 {
-    try {
-        if (!checkFiles()) {
-            throw std::string("the opening of files failed !");
-        }
-        if (!mPWM.openFromFile()) {
-            throw std::string("of errors in the PWM input data !");
-        }
-        if (!FromDNAandPWM()) {
-            throw std::string("of errors in the DNA input data !");
-        }
-    } catch (std::string m_error) {
-        std::cerr << "No output because " << m_error << std::endl;
-    }
+	try {
+	    checkFiles();
+	    mPWM.openFromFile(mPWMFileN);
+	    FromDNAandPWM();
+	    print(std::cout);
+	    std::ofstream write(mOutFileN);
+	  	print(write);
+	    write.close();
+	} catch (std::runtime_error error) {
+		std::cerr << error.what() << std::endl;
+	}
 }
 
-bool Interface::checkIfFile(std::string const& filename, std::string const& extension) const
+std::ostream& Interface::print(std::ostream& p_out) const
+{
+    for (const auto& seq: mData) {
+        p_out << seq;
+    }
+    return p_out;
+}
+
+bool Interface::checkIfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
-    if ((!regex_match(filename, r_check) || (filename == extension))) {
-        return false;
-    }
+    if ((!regex_match(filename, r_check) || (filename == extension))) return false;
     std::ifstream file(filename);
-    if (file.fail()) {
-        return false;
-    }
+    if (file.fail()) return false;
     file.close();
     return true;
 }
 
-bool Interface::checkOfFile(std::string const& filename, std::string const& extension) const
+bool Interface::checkOfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
-    if ((!regex_match(filename, r_check) || (filename == extension))) {
-        return false;
-    }
+    if ((!regex_match(filename, r_check) || (filename == extension))) return false;
     std::ofstream file(filename);
-    if (file.fail()) {
-        return false;
-    }
+    if (file.fail()) return false;
     file.close();
     return true;
 }
@@ -83,63 +70,66 @@ bool Interface::setOut(std::string const& filename)
 bool Interface::setPWM(std::string const& filename)
 {
     mPWMFileN = filename;
-    return mPWM.newFile(filename); //! newFile n'existe pas... se serait un setFileName dans PWM -> une autre conception...
+    return checkIfFile(filename, ".mat");
 }
 
 void Interface::setThreshold(double const& thresh)
 {
-    threshold = double(thresh);
+    mThreshold = double(thresh);
+    mSetThresh = true;
 }
 
-bool Interface::checkFiles() const
+void Interface::checkFiles() const
 {
-    return checkIfFile(mDNAFileN) && checkIfFile(mPWMFileN, ".mat") && checkOfFile(mOutFileN);
-}
-
-bool Interface::FromDNAandPWM()
-{
-/*!
- Note: J'ai voulu faire des tests en utilisant un cmake avec des fichiers DNA et PWM non-complets.
-       Au lieu d'utiliser un DNAReader(que je ne sais pas encore utiliser), j'ai utilisé un pointeur sur
-       un ifstream pour itérer sur DNA depuis l'interface...
-*/
-
-    setThreshold(log(0.25)*mPWM.size()); //! Valeur par défaut, ne permet pas l'utilisation de setThreshold en dehors de l'interface.
-    std::ifstream DNAFile(mDNAFileN);
-    std::ofstream OutFile(mOutFileN);
-    for (size_t i(0); !DNAFile.eof(); ++i) {
-        mDNA.readDNAFromFile(&DNAFile, mPWM.size()); //! Pour changer de segment/séquence
-
-        OutputSeqData sFwd;
-        OutputSeqData sRev;
-        sFwd.Number = i;
-        sRev.Number = i;
-        sRev.Fwd = '-';
-
-        sFwd.Seq = mDNA.currentSeq(); //! Prend le segment fwd dans DNA
-        sRev.Seq = mDNA.reverseSeq(); //! Prend le segment rev dans DNA
-        calcScore(sFwd, OutFile); //! calcule le score du segment fwd
-        calcScore(sRev, OutFile); //! calcule le score du segment rev
+    if (!(checkIfFile(mDNAFileN) && checkIfFile(mPWMFileN, ".mat") && checkOfFile(mOutFileN))) {
+        throw std::runtime_error("Opening of a file failed !");
     }
-    DNAFile.close();
-    OutFile.close();
-    return true; //! Pour plus tard... En cas de prob. en cours de route dans DNA ?
 }
 
-void Interface::calcScore(OutputSeqData& OSD, std::ofstream& file)
+void Interface::FromDNAandPWM()
 {
-    if ((OSD.Seq.length() == mPWM.size())) {
-        for (size_t j(0); j < mPWM.size(); ++j) {
-            if (mPWM.score(j, convert(OSD.Seq[j])) == 0) {
-                OSD.Score += threshold;
+    mData = std::vector<SeqData>();
+    if (!mSetThresh) {
+		setThreshold(log(0.25)*mPWM.size());
+	}
+    mDNA.start(mDNAFileN);
+    for (size_t i(0); !mDNA.eof(); ++i) {
+        if (mDNA.next(mPWM.size())) {
+            SeqData sFwd(mDNA.fwd(), i, mDNA.header());
+            SeqData sRev(mDNA.rv(), i, mDNA.header(), false);
+
+            calcScore(sFwd);
+            calcScore(sRev);
+        }
+    }
+}
+
+void Interface::calcScore(SeqData& sd)
+{
+    typedef enum {A, C, G, T, N} nuc;
+    std::map<char, nuc> char2nuc{{'A',A},{'a',A},
+                                 {'C',C},{'c',C},
+                                 {'G',G},{'g',G},
+                                 {'T',T},{'t',T},
+                                 {'N',N},{'n',N},{'-',N},{'.',N}};
+
+    for (size_t j(0); j < mPWM.size(); ++j) {
+        if(char2nuc[sd[j]] != 4) {
+            if (mPWM[j*4 + char2nuc[sd[j]]] == 0) {
+                sd += mThreshold;
+                j = mPWM.size();
             } else {
-                OSD.Score += log(mPWM.score(j, convert(OSD.Seq[j])));
+                sd += log(mPWM[j*4 + char2nuc[sd[j]]]);
             }
         }
-        if (OSD.Score > threshold) {
-            file << OSD.Strand << " " << OSD.Number << " " << OSD.Fwd << " " << OSD.Seq << " " << OSD.Score << std::endl;
-            std::cout << OSD.Strand << " " << OSD.Number << " " << OSD.Fwd << " " << OSD.Seq << " " << OSD.Score << std::endl;
-        }
-        mDNAandPWM.push_back(OSD);
-    } //!else : we reached end of file. -> Le dernier segment avait la taille mPWM.size()-1
+    }
+    if (sd > mThreshold) {
+        mData.push_back(sd);
+    }
+}
+
+std::ostream& operator<<(std::ostream& p_out, Interface const& p_inter)
+{
+    p_inter.print(p_out);
+    return p_out;
 }

@@ -6,7 +6,7 @@ enable_testing()
 include_directories(extlib/googletest/include extlib/googletest)
 link_directories(extlib/googletest/build)
 
-add_executable(../bin/exec.out src/main.cpp src/PWM.cpp src/DNAReader.cpp)
+add_executable(../bin/exec.out src/main.cpp src/PWM.cpp src/DNA.cpp src/Interface.cpp src/SeqData.cpp)
 add_executable(../bin/unit_tests src/SuperDNAReader.cpp tests/tests.cpp)
 
 target_link_libraries(../bin/exec.out m)
