@@ -38,8 +38,9 @@ public:
 
     /*!
      *  Function 4
-     *  param double
-     *  sets threshold (if you don't want the default one)
+     *  param double 
+     *  We only accept negative values, everthing above 0 sets (or resets) mSetThresh to false which 
+     *	means that we reset mThreshold to default value.)
      */
     void setThreshold(double const&);
 
@@ -59,7 +60,6 @@ public:
 
 	/*!
 	 *  Function 7
-	 *  no param
 	 *  calculates output from DNA and PWM
 	 */
     void output();
@@ -83,22 +83,19 @@ private:
 
 	/*!
 	 * private function 1
-	 * no param
-	 * Check the streams of DNA, PWM and Output files
+	 * Checks the streams of DNA, PWM and Output files
 	 */
     void checkFiles() const;
 
     /*!
      * private function 2
-     * no param
-     * Read DNA and set the score calculation
+     * Reads DNA and sets the score calculation
      */
     void FromDNAandPWM();
 
     /*!
      * private function 3
-     * no param
-     * calculate the scores and stores output data
+     * calculates the scores and stores output data
      */
     void calcScore(SeqData&);
 };

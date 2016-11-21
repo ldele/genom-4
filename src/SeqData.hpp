@@ -16,7 +16,7 @@ public:
 
     /*!
      * Function 1
-     * returns '+' if mFwd, '-' if !mFwd
+     * returns '+' if the DNA fragment is on the fwd strand and '-' if it is on the reverse
      */
     char fwd() const;
 

@@ -9,30 +9,35 @@ class newIfstream
 {
 	public:
 	/*!
-	 * Function1 
-	 * no param
+	 * Function 1
 	 * gets current position in file
 	 */
 	unsigned long int getCPos() const { return mCPos; }
 
 	/*!
-	 * Function2
+	 * Function 2
 	 * param const std::string& (filename)
 	 * modified std::ifstream::open
 	 */
 	void open(const std::string&);
 
 	/*!
-	 * Function3
+	 * Function 3
 	 * calls std::ifstream::close()
 	 */
 	void close() { mFileStream.close(); }
 	
 	/*!
-	 * Function3
+	 * Function 4
 	 * returns std::ifstream::eof()
 	 */
 	bool eof() { return mFileStream.eof(); }
+
+	/*!
+	 * Function 5
+	 * returns std::ifstream::peek()
+	 */
+	char peek() { return mFileStream.peek(); }
 
 	/*!
 	 * Friend Function
@@ -55,7 +60,7 @@ public:
 
 	/*!
 	 * Constructor (default)
-	 * no param, everything initialized in void DNA::start(std::string&)
+	 * no param, everything initialized in void DNA::start(std::string&).
 	 */
 	DNA() = default;
 
@@ -99,7 +104,6 @@ public:
 	
 	/*! 
 	 * Function 6
-	 * no param
 	 * returns mFileStream.eof()
 	 */
 	bool eof();
@@ -120,8 +124,7 @@ private:
     /*!
      * Private function 2
      * param char (character to be added in the Fwd DNA fragment)
-     * is called to slide on DNA (1 char step) -1 ------- +1
-     * (updates mFwd when we stay on the same strand)
+     * updates mFwd when we stay on the same strand
      */
     void add(const char);
 
@@ -132,6 +135,11 @@ private:
      */
     newIfstream& getPartOfLine(const size_t&);
 
+    /*!
+     * Private function 4
+     * checks if the sequence contains wrong characters (!= ACGTacgtNn.-)
+     * if the sequence contains wrong characters, throw std::runtime_error and stops program 
+     */
     void checkSeq() const;
 };
 

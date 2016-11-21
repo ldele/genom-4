@@ -12,29 +12,43 @@ Interface::Interface(std::string const& DNAfile, std::string const& Outfile, std
 {
 }
 
+/* 
+ * The program is centralized in the following function.
+ * The function stops without delivering output if:
+ *	we cannot open a file,
+ *	we find an unallowed character in the PWM or DNA file. 
+ */
 void Interface::output()
 {
 	try {
 	    checkFiles();
-	    mPWM.openFromFile(mPWMFileN);
-	    FromDNAandPWM();
-	    print(std::cout);
+	    mPWM.openFromFile(mPWMFileN); //initializes PWM
+	    FromDNAandPWM(); //calculates scores and sets output
+	    print(std::cout); //prints output on terminal
 	    std::ofstream write(mOutFileN);
-	  	print(write);
+	  	print(write); //writes output in the specified output file
 	    write.close();
 	} catch (std::runtime_error error) {
 		std::cerr << error.what() << std::endl;
 	}
 }
 
-std::ostream& Interface::print(std::ostream& p_out) const
+/*
+ * Interface::print is used to write the output data in a file or to 
+ * print it on a terminal.
+ */
+std::ostream& Interface::print(std::ostream& out) const
 {
     for (const auto& seq: mData) {
-        p_out << seq;
+        out << seq;
     }
-    return p_out;
+    return out;
 }
 
+/*
+ * Generalized ifstream control function. Controls if the filename is correct (extension) 
+ * and if we can open/find the file. 
+ */
 bool Interface::checkIfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
@@ -45,6 +59,10 @@ bool Interface::checkIfFile(std::string const& filename, std::string const& exte
     return true;
 }
 
+/*
+ * Generalized ofstream control function. Controls if the filename is correct (extension) 
+ * and if we can open/find the file. 
+ */
 bool Interface::checkOfFile(std::string const& filename, std::string const& extension)
 {
     std::regex r_check(".*\\" + extension);
@@ -75,10 +93,14 @@ bool Interface::setPWM(std::string const& filename)
 
 void Interface::setThreshold(double const& thresh)
 {
-    mThreshold = double(thresh);
-    mSetThresh = true;
+	if (thresh > 0) mSetThresh = false;
+	else {
+	    mThreshold = double(thresh);
+	    mSetThresh = true; //if false we use ln(0.25)*PWM size
+	}
 }
 
+//All files need to be ok, to run the program.
 void Interface::checkFiles() const
 {
     if (!(checkIfFile(mDNAFileN) && checkIfFile(mPWMFileN, ".mat") && checkOfFile(mOutFileN))) {
@@ -90,11 +112,11 @@ void Interface::FromDNAandPWM()
 {
     mData = std::vector<SeqData>();
     if (!mSetThresh) {
-		setThreshold(log(0.25)*mPWM.size());
+		setThreshold(log(0.25)*mPWM.size()); //default threshold value
 	}
-    mDNA.start(mDNAFileN);
+    mDNA.start(mDNAFileN); //initialize DNA
     for (size_t i(0); !mDNA.eof(); ++i) {
-        if (mDNA.next(mPWM.size())) {
+        if (mDNA.next(mPWM.size())) { //updates header, forward DNA seq. and reverse DNA seq.
             SeqData sFwd(mDNA.fwd(), i, mDNA.header());
             SeqData sRev(mDNA.rv(), i, mDNA.header(), false);
 
@@ -123,13 +145,13 @@ void Interface::calcScore(SeqData& sd)
             }
         }
     }
-    if (sd > mThreshold) {
-        mData.push_back(sd);
+    if (sd > mThreshold) { // Compares the threshold with the score stored in the SeqData
+        mData.push_back(sd); 
     }
 }
 
-std::ostream& operator<<(std::ostream& p_out, Interface const& p_inter)
+std::ostream& operator<<(std::ostream& out, Interface const& inter)
 {
-    p_inter.print(p_out);
-    return p_out;
+    inter.print(out);
+    return out;
 }
