@@ -7,11 +7,11 @@ include_directories(extlib/googletest/include extlib/googletest)
 link_directories(extlib/googletest/build)
 
 add_executable(../bin/exec.out src/main.cpp src/PWM.cpp src/DNA.cpp src/Interface.cpp src/SeqData.cpp)
-add_executable(../bin/unit_tests src/SuperDNAReader.cpp tests/tests.cpp)
+#add_executable(../bin/unit_tests src/SuperDNAReader.cpp tests/tests.cpp)
 
 target_link_libraries(../bin/exec.out m)
-target_link_libraries(../bin/unit_tests gtest gtest_main)
-add_test(unit_tests ../bin/unit_tests)
+#target_link_libraries(../bin/unit_tests gtest gtest_main)
+#add_test(unit_tests ../bin/unit_tests)
 
 find_package(Doxygen)
 add_custom_target(doc
