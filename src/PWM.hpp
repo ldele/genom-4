@@ -3,104 +3,194 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <fstream>
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
 
-/*! PWM class */
-using namespace std;
-
+/*!
+ * @class PWM
+ */
 class PWM
 {
 public:
 	/*!
-	 * Constructeur par défaut
+	 * @brief Default Constructor
 	 */
 	PWM() = default;
 
 	/*!
-     * Constructeur
-     * param PWM filename
+	 * @brief Copy Constructor
+	 */
+	PWM(const PWM&);
+
+	/*!
+	 * @brief Constructor std::vector<double>
+	 *
+	 * @param tab of scores
+	 */
+	PWM(std::vector<double> const&);
+
+	/*!
+	 * @brief rvalue copy
+	 *
+	 * @param other PWM (rvalue state)
+	 * @return *this
+	 */
+	const PWM& operator=(PWM&&);
+
+	/*!
+	 * @brief lvalue copy
+	 *
+	 * @param other PWM (lvalue state)
+	 * @return *this
+	 */
+	const PWM& operator=(const PWM&);
+
+	/*!
+     * @brief lvalue copy from 2D double vector
+     *
+     * @param 2D vector of doubles
+     * @return *this
      */
-	PWM(const std::string& filename); 
+	const PWM& operator=(const std::vector<std::vector<double>>&);
 	
 	/*!
-     * Function 1
-     * Ouvre un fichier et le lit
+     * @brief Initialize, check and normalize PWM
+     *
+     * @param filename containing pwm input data
+     *
+     * @note All matrices are converted to PPM format.
+     * PPM initialization -> positive values & no null lines (only zeros)
+     * PSSM initialization -> negative values & no -inf lines (only -inf)
      */
 	void openFromFile (const std::string& filename); 
 
+	/*!
+	 * @brief Get column size of PWM.
+	 * 
+	 * @return pwm column size (if PWM is a M(n,4) matrix, return n)
+	 */
 	size_t size() const { return mPWM.size(); }
-    double operator[](const size_t&);
+
+	/*!
+	 * @brief Get score in a specified position of PWM
+	 * 
+	 * @param pos 1D position in matrix (line 1 line 2 line 3 ...)
+	 * @return score of the specified position.
+	 */
+    double operator[](const size_t&) const;
+
+    /*!
+     * @brief Print values of a specified matrix
+     *
+     * @param[out] out std::cout or filestream
+     * @return out (parameter) modified stream
+     */
+    std::ostream& print(std::ostream& out) const;
+
+    /*!
+     * @brief save pwm to file
+     *
+     * @param filepath of output
+     */
+    void saveToFile(const std::string& filename);
 	
-	
-	vector<vector<double> > getmPWM () {return mPWM;}
-	std::string PWMToConsensus (vector<vector<double> >);
+	/*!
+	 * @brief Extract consensus from PWM
+	 *
+	 * @return consensus dna fragment of mPWM
+	 */
+	std::string PWMToConsensus() const;
 
 private:
 
-	  
+	/*!
+	 * @brief Check all values of PWM (for post-initialization or copy)
+	 *
+	 * @note since first initialization of PWM is done from a file 
+	 * (using openFromFile). This function should never throw exceptions.
+	 * -> other initialization?
+	 */
+	void checkAll();
 
 	/*!
-     * Private function
-     * Check si la valeur introduite est une lettre ou un caractère - Vérification de la matrice
+     * @brief Check if the input values are valid characters (only numbers are allowed)
+     *
+     * @param filename containing pwm input data
+     * @return true if the pwm input file contains only valid characters.
      */
-	bool checkLetter(const std::string& filename);
+	bool checkLetter(const std::string& filename) const;
+
+	/*!
+	 * @brief Check number of elements in file and determines if we use the PSSM or the PPM algorithm.
+	 *
+	 * @param filename containing pwm input data
+	 *
+	 * @return true -> PPM algorithm used
+	 * false -> PSSM algorithm used
+	 *
+	 * number of elements in file needs to be a multiple of 4
+	 */
+	bool checkSize(const std::string& filename) const;
+
+	/*!
+	 * @brief Initialize mPWM
+	 *
+	 * @param filename containing pwm input data
+	 * @param function checkscorePPM or checkscorePSSM (program recognizes format)
+	 */
+	void initPWM(const std::string& filename, void(PWM::*function)(const double&)const);
 	
 	/*!
-     * Private function
-     * Check si valeur est comprise entre 0 et 1
+     * @brief Check if the parameter is between 0 and 1 (for PPM algorithm)
+     *
+     * @param score to check and add in mPWM
      */
-	void checkscorePWM(double score);
+	void checkscorePPM(const double& score) const;
 	 
 	/*!
-     * Private function
-     * Check si le log est compris entre -infini et 0
+     * @brief Check if the value is negative (for PSSM algorithm)
+     *
+     * @param score to check and add in mPWM
      */
-	void checkscorePSSM(double score);
+	void checkscorePSSM(const double& score) const;
 	
 	/*!
-     * Private function
-     * Check si la somme des valeurs d'une ligne de PWM est = 1
-     */
-	void checkLigne(double somme, unsigned int l);
-	
-	/*!
-     * Private function
-     * Methode qui transforme la matrice PPM a (PPM / la constante (plus grande valeur de la matrice))
+     * @brief Function converting mPWM from PPM to PPMC
+     *
+     * @note PPMs contain values between 0 and 1. The sum of each line equals 1.
+     * @n PPMCs are normalized PPMs obtained by divising each line member by the max value of its line. 
+     * @n max value of each line will be 1. (/!\ max values need to be != 0)
      */
 	void transfoPPMC();
+
+	/*!
+	 * @brief Function converting mPWM from PPMC to PPM
+	 *
+	 * Divise each element by the sum of its line. /!\ sums need to be != 0 
+	 */
+	void returnToPPM();
 	
 	/*!
-     * Private function
-     * Methode qui transforme la matrice PPM a log(PPM)
+     * @brief Function converting mPWM from PPM to PSSM
+     *
+     * @note PSSM are obtained by taking the natural logarithm of each PPM members.
+     * @n PSSM = ln(PPM)
      */
 	void transfoPSSM();
 	
 	/*!
-     * Private function
-     * Methode qui transforme la matrice PSSM a exp(PSSM)
+     * @brief Function converting mPWM from PSSM to PPM
      */
 	void transfoPPM();
 	
 	/*!
-     * Private function
-     * Methode qui transforme la matrice PSSM a (PSSM - la constante (plus grande valeur de la matrice))
+     * @brief Function converting mPWM from PSSM to PSSMC
+     *
+     * @note PSSMC are noramalized PSSM obtained by substracting the max value of each line from all line members.
      */
 	void transfoPSSMC();
 
-	vector<vector<double> > mPWM; /*!< Matrice du score */
-	
-	vector<vector<double> > mPPMC; /*!< Matrice obtenue en faisant PPM / la constante (plus grande valeur de la matrice) */
-
-	vector<vector<double> > mPSSM; /*!< Matrice obtenue en faisant log(PPM) */
-	
-	vector<vector<double> > mPSSMC; /*!< Matrice obtenue en faisant PSSM -la constante (plus grande valeur de la matrice) */
-
-	bool mIsPPM; /*!< True if PWM is PPM/PPMC and false if PWM is PSSM/PSSMC */
-
+private:
+	std::vector<std::vector<double>> mPWM; 		///< Matrix containing the scores
 };
 
 #endif

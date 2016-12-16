@@ -3,136 +3,105 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
-/*! newIfstream class */
-class newIfstream
-{
-	public:
-	/*!
-	 * Function1 
-	 * no param
-	 * gets current position in file
-	 */
-	unsigned long int getCPos() const { return mCPos; }
-
-	/*!
-	 * Function2
-	 * param const std::string& (filename)
-	 * modified std::ifstream::open
-	 */
-	void open(const std::string&);
-
-	/*!
-	 * Function3
-	 * calls std::ifstream::close()
-	 */
-	void close() { mFileStream.close(); }
-	
-	/*!
-	 * Function3
-	 * returns std::ifstream::eof()
-	 */
-	bool eof() { return mFileStream.eof(); }
-
-	/*!
-	 * Friend Function
-	 * param1 newIfstream&, param2 template
-	 * overloads '>>'
-	 * ++mCPos for each element read in file.
-	 */
-	template<typename T>
-	friend std::ifstream& operator>>(newIfstream&, T&);
-
-	private:
-	unsigned long int mCPos; /*!< current position in file */
-	std::ifstream mFileStream; /*!< DNA filestream */
-};
-
-/*! DNA class */
+/*!
+ * @class DNA
+ *
+ * @brief Read dna file memorizing one dna fragment
+ */
 class DNA
 {
 public:
 
 	/*!
-	 * Constructor (default)
-	 * no param, everything initialized in void DNA::start(std::string&)
+	 * @brief Default constructor
+	 *
+	 * @note you need to call DNA::start() to initialize DNA
 	 */
 	DNA() = default;
 
 	/*!
-	 * Destructor (default)
+	 * @brief Default destructor
 	 */
 	virtual ~DNA() = default;
 
-	/*! 
-	 * Function 1
-	 * gets mFwd (forward DNA frag.)
+	/*!
+	 * @brief Get forward dna fragment
+	 *
+	 * @return forward dna fragment (mFwd) 
 	 */
-	std::string fwd() const { return mFwd; }
-
-	/*! 
-	 * Function 2
-	 * gets mRv (reverse DNA frag.)
-	 */
-	std::string rv() const { return mRv; }
+	const std::string& fwd() const noexcept { return mFwd; }
 
 	/*!
-	 * Function 3
-	 * gets mHeader (header/DNA strand name)
+	 * @brief Get reverse dna fragment
+	 *
+	 * @return reverse dna fragment (not memorized)
 	 */
-	std::string header() const { return mHeader; }
+	const std::string rv() const noexcept;
 
-	/*! 
-	 * Function 4
-	 * param std::string (DNA filename)
-	 * called in Interface, opens mFileStream and resets DNA fragments + mHeader
+	/*!
+	 * @brief Get current header
+	 *
+	 * @return mHeader (the current header of the dna fragment)
 	 */
-    void start(const std::string&); 
+	const std::string& header() const noexcept { return mHeader; }
 
-	/*! 
-	 * Function 5
-	 * param size_t (size of PWM)
-	 * updates mFwd, mRv and mHeader
-	 * called in Interface to update DNA (and get next fragments)
+	/*!
+	 * @brief Set or reset DNA ((re)initialize values and stream)
+	 *
+	 * @param filepath dna filename (/!\ no check)
+	 * @return number of character in file
+	 *
+	 * @see Interface::readDNA()
 	 */
-	bool next(const size_t&);
-	
-	/*! 
-	 * Function 6
-	 * no param
-	 * returns mFileStream.eof()
+    size_t start(const std::string&) noexcept;
+
+	/*!
+	 * @brief uUdate mFwd, mRv and mHeader
+	 *
+	 * @param size of pwm column
+	 *
+	 * @see Interface::readDNA()
 	 */
-	bool eof();
+	bool next(const std::size_t& size);
+
+	/*!
+	 * @brief Check if we reached end of dna file
+	 * 
+	 * @return mFileStream.eof()
+	 *
+	 * @see Interface::readDNA()
+	 */
+	bool eof() noexcept { return mFileStream.eof(); }
 
 private:
-	std::string mHeader; /*!< Header/strand name */
-	std::string mFwd; /*!< Forward DNA fragment */
-	std::string mRv; /*!< Reverse DNA fragment */
-	newIfstream mFileStream; /*!< modified std::ifstream */
-
 	/*!
-	 * Private function 1
-	 * param size_t (size of PWM)
-	 * called when we change of DNA strand
+	 * @brief Change strand (We consider fwd and rv to be the same strand)
+	 *
+	 * @param size of pwm column
 	 */
-    void nextStrand(const size_t&);
+    void nextStrand(const std::size_t& size);
 
     /*!
-     * Private function 2
-     * param char (character to be added in the Fwd DNA fragment)
-     * is called to slide on DNA (1 char step) -1 ------- +1
-     * (updates mFwd when we stay on the same strand)
+     * @brief Read a dna fragment that has pwm column size. (from "" to fragment)
+	 *
+	 * @param size of pwm column
      */
-    void add(const char);
+    std::ifstream& getPartOfLine(const std::size_t& size);
 
-    /*! 
-	 * Private function 3
-	 * param const size_t& (size of PWM)
-	 * resets mFwd and reads a DNA fragment of PWM size in file
+    /*!
+     * @brief Check dna fragments and some elements of file format
+     *
+     * file format : check presence of header and empty lines @n
+     * dna fragment : search wrong characters (!= ACGTacgtNn.-)
      */
-    newIfstream& getPartOfLine(const size_t&);
+    void checkSeq();
 
-    void checkSeq() const;
+private:
+	std::string mHeader = "";      			///< header/strand name
+	std::string mFwd = "";         			///< forward dna fragment
+	std::ifstream mFileStream;  			///< dna filestream
 };
 
 #endif //DNA_HPP

@@ -1,43 +1,41 @@
 #include "SeqData.hpp"
 
-SeqData::SeqData(std::string seq, size_t pos, std::string str, bool fwd, double score)
+SeqData::SeqData(std::string const& seq, size_t const& pos, std::string const& head, bool const& fwd)
 :mSeq(seq)
 ,mPos(pos)
-,mStrand(str)
-,mFwd(fwd)
-,mScore(score)
+,mStrand(head)
 {
+	if (fwd) mFwd = '+';
+	else mFwd = '-';
 }
 
-char SeqData::fwd() const
-{
-    if (mFwd) return '+';
-    else return '-';
-}
-
-char SeqData::operator[](const size_t& pos) const
+const char& SeqData::operator[](const size_t& pos) const
 {
     return mSeq[pos];
 }
 
-SeqData& SeqData::operator+=(const double& score)
+SeqData& SeqData::operator+=(const double& score) noexcept
 {
 	mScore += score;
 	return *this;
 }
 
-bool SeqData::operator>(const double& score) const
+bool SeqData::operator>(const double& threshold) const noexcept
 {
-	return mScore > score;
+	return mScore > threshold;
 }
 
-size_t SeqData::length() const
+bool SeqData::fwd() const noexcept
 {
-    return mSeq.length();
+    if (mFwd == '+' ) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-std::ostream& operator<<(std::ostream& out, const SeqData& sd)
+std::ostream& operator<<(std::ostream& out, const SeqData& sd) noexcept
 {
-    out << sd.mStrand << " " << sd.mPos << " " << sd.fwd() << " " << sd.mSeq << " " << sd.mScore << std::endl;
+    out << sd.mStrand << " " << sd.mPos << " " << sd.mFwd << " " << sd.mSeq << " " << sd.mScore << std::endl;
     return out;
 }

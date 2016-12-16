@@ -1,8 +1,0 @@
-
-string returnSeg(unsigned int startpos, unsigned int lenght ){
-
-return string.substr( starpos, lenght);
-
-
-} // fonction qui nous retourne une sous chaine qui commence a starpos et de longueur lenght
-//Elle nous retourne un DNA qui est un string, et ca 

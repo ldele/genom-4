@@ -5,111 +5,160 @@
 #include "PWM.hpp"
 #include "SeqData.hpp"
 
-/*! Interface class */
+/*!
+ * @class Interface 
+ */
 class Interface
 {
 public:
-	/*!
-	 * Constructor
-	 * param1 DNA filename, param2 Output filename, param3 PWM filename
-	 */
-    Interface(std::string const&, std::string const&, std::string const&);
+    /*!
+     * @brief Default constructor
+     */
+    explicit Interface() = default;
 
 	/*!
-	 * Function 1
-	 * param std::string (filename)
-	 * sets PWM
+	 * @brief Constructor
+	 *
+	 * @param dnaFilename has to be @em fasta or @em fa
+     * @param pwmFilename has to be @em mat
+     * @param outputFilename
+	 */
+	explicit Interface(std::string const&, std::string const&, std::string const&);
+
+    /*!
+     * @brief Constructor (with PWM already initialized)
+     *
+     * @param dnaFilename has to be @em fasta or @em fa
+     * @param newPWM has to be in norm
+     * @param outputFilename
+     */
+	explicit Interface(std::string const&, PWM const&, std::string const&);
+
+	/*!
+	 *  @brief Copy deleted
+	 */
+	Interface& operator=(const Interface&) = delete;
+
+    /*!
+     * @brief Calculate output from DNA and PWM
+     *
+     * @return 0 if everything went as expected and 1 if there was an issue.
+     *
+	 * @note Call output() to run the program
+     *
+     * The program stops without delivering output if :
+     *      @n it cannot open dna or pwm file,        
+     *      @n it finds an unallowed character in the pwm or dna file,
+     *      @n it finds errors in input format that have impact on output values.
+     */
+	void output();
+
+    /*!
+     * @brief Set new dna input file
+     *
+     * @param filename dna filename (has to be @em fasta)
+     * @return checkFile(filename, ".fasta") return value @see Interface::checkFile()
+     */
+    bool setDNA(std::string const&);
+
+    /*!
+     * @brief Set new output file
+     *
+     * @param filename output filename (has to be @em fasta)
+     * @return checkFile(filename, ".fasta") return value @see Interface::checkFile()
+     */
+    bool setOut(std::string const&);
+
+	/*!
+	 * @brief Set new pwm input file
+	 *
+	 * @param filename pwm filename (has to be @em mat)
+	 * @return checkFile(filename, ".fasta", std::ios::out) return value @see Interface::checkFile()
 	 */
     bool setPWM(std::string const&);
 
     /*!
-	 * Function 2
-	 * param std::string (filename)
-	 * sets DNA
-	 */
-    bool setDNA(std::string const&);
-
-    /*!
-	 * Function 3
-	 * param std::string (filename)
-	 * sets outputFile
-	 */
-    bool setOut(std::string const&);
-
-    /*!
-     *  Function 4
-     *  param double
-     *  sets threshold (if you don't want the default one)
+     * @brief Say we use stored pwm input filename to initialize PWM 
+     *
+     * @return checkFile(mOutFilename, ".fasta", std::ios::out) return value @see Interface::checkFile() 
      */
-    void setThreshold(double const&);
+    bool setPWM();
+
+    /*!
+     * @brief To set if we print output on terminal or not.
+     *
+     * @param pr true we print ouptut on terminal \n false we don't 
+     */
+    void setPrintOnTerminal(bool) noexcept;
+
+    /*!
+     * @brief Set new PWM
+     *
+     * @param newPWM other PWM
+     * @return mPWM
+     *
+     * @see PWM::operator=(PWM const&)
+     */
+    const PWM& setPWM(const PWM& newPWM);
+
+    /*!
+     * @brief Set the score threshold
+     *
+     * @param threshold new mThreshold
+     */
+    void setThreshold(double const&) noexcept;
 
 	/*!
-	 *	Function 5
-	 *  param 1 std::string (filename), param 2 std::string (extension)
-	 *  checks extension and ifstream
+	 * @brief Reset threshold to default value
+	 *
+	 * @note Threshold default value is 'PWM column size' * ln(0.25)
 	 */
-    static bool checkIfFile(std::string const&, std::string const& = ".fasta");
-
-    /*!
-	 *	Function 6
-	 *  param 1 std::string (filename), param 2 std::string (extension)
-	 *  checks extension and ofstream
-	 */
-    static bool checkOfFile(std::string const&, std::string const& = ".fasta");
+	void setThreshToDefault() noexcept;
 
 	/*!
-	 *  Function 7
-	 *  no param
-	 *  calculates output from DNA and PWM
+	 * @brief Check fstream and filename
+	 *
+	 * @param filename name of a file
+	 * @param extension @em fasta, @em mat, etc
+	 * @param openMode file openmode (std::ios::in, std::ios::out, ...)
+	 * @return false if the program cannot open the file or the file does not possess the specified extension.
 	 */
-    void output();
-
-    /*!
-     *  Function 8
-     *  param std::ostream&
-     *  prints output data (if stored in memory)
-     */
-    std::ostream& print(std::ostream&) const;
+    static bool checkFile(std::string const&, std::string const& = ".fasta", std::ios_base::openmode = std::ios::in) noexcept;
 
 private:
-    DNA mDNA; /*!< DNA fragments */
-    PWM mPWM; /*!< Matrix containing scores (and controls) */
-    std::string mDNAFileN; /*!< DNA filename */
-    std::string mPWMFileN; /*!< PWM filename */
-    std::string mOutFileN; /*!< Output filename */
-    double mThreshold; /*!< Threshold; minimum interesting dna fragment score */
-    std::vector<SeqData> mData;  /*!< Stored output data */
-    bool mSetThresh = false; /*!< Boolean, is true if we changed the threshold otherwise we use default value */
-
 	/*!
-	 * private function 1
-	 * no param
-	 * Check the streams of DNA, PWM and Output files
+	 * @brief Check all files & streams
 	 */
     void checkFiles() const;
 
     /*!
-     * private function 2
-     * no param
-     * Read DNA and set the score calculation
+     * @brief Iterate on DNA (reads dnafile and updates fragments)
+     *
+     * Function called in Interface::output()
      */
-    void FromDNAandPWM();
+	void readDNA();
 
     /*!
-     * private function 3
-     * no param
-     * calculate the scores and stores output data
+     * @brief Calculate dna fragment scores using PWM
+     *
+     * @param sd dna fragment and all data @see SeqData
+	 * @return true if SeqData's score > threshold
+     *
+     * function called in Interface::readDNA()
      */
-    void calcScore(SeqData&);
-};
+	bool readPWM(SeqData&);
 
-/*!
- * Bonus function
- * param 1 std::ostream&, param 2 Interface
- * calls void Interface::print(std::ostream&)
- * overloads '<<'
- */
-std::ostream& operator<<(std::ostream&, Interface const&);
+private:
+    DNA mDNA;                       ///< dna fragments
+    PWM mPWM;                       ///< pwm Matrix
+    std::string mDNAFilename;       ///< dna input filename
+    std::string mPWMFilename;       ///< pwm input filename
+	std::string mOutFilename;		///< output filename
+    double mThreshold;              ///< score threshold
+    bool mSetThresh = false;        ///< true, the program uses an user threshold value, @n false the default value
+    bool mSetPWM = false;           ///< true, the program doesn't need to initialize PWM from a file
+    bool mPinTerm = false;          ///< true, print output in terminal
+};
 
 #endif
 
