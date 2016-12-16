@@ -20,10 +20,15 @@ public:
     SeqData(std::string const&, size_t const&, std::string const&, bool const& = true);
 
     /*!
+<<<<<<< HEAD
      * @brief Get a dna base from fragment.
      *
      * @param pos position in dna fragment
      * @return A, C, G, T etc... from sequence.
+=======
+     * Function 1
+     * returns '+' if the DNA fragment is on the fwd strand and '-' if it is on the reverse
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
      */
     const char& operator[](const size_t&) const;
 

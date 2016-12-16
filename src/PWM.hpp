@@ -12,7 +12,11 @@ class PWM
 {
 public:
 	/*!
+<<<<<<< HEAD
 	 * @brief Default Constructor
+=======
+	 * default constructor enabled
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 	 */
 	PWM() = default;
 
@@ -64,13 +68,19 @@ public:
 	void openFromFile (const std::string& filename); 
 
 	/*!
+<<<<<<< HEAD
 	 * @brief Get column size of PWM.
 	 * 
 	 * @return pwm column size (if PWM is a M(n,4) matrix, return n)
+=======
+	 * Function 2
+	 * returns size_t (if PWM is a M(x,4) matrix, returns x)
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 	 */
 	size_t size() const { return mPWM.size(); }
 
 	/*!
+<<<<<<< HEAD
 	 * @brief Get score in a specified position of PWM
 	 * 
 	 * @param pos 1D position in matrix (line 1 line 2 line 3 ...)
@@ -111,6 +121,28 @@ private:
 	 */
 	void checkAll();
 
+=======
+	 * Function 3
+	 * param size_t (i*4 + column(depends of character; for example A is 0 and G is 2))
+	 * returns score
+	 */
+    double operator[](const size_t&);
+	
+	/*!
+	 * Function 4	
+	 * returns mPWM matrix (std::vector<std::vector<double>>)
+	 */
+	vector<vector<double> > getmPWM () {return mPWM;}
+
+	/*!
+	 * Function 5
+	 * returns the sequence which has the highest overall score
+	 */
+	std::string PWMToConsensus (vector<vector<double> >);
+
+private:
+
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 	/*!
      * @brief Check if the input values are valid characters (only numbers are allowed)
      *

@@ -62,10 +62,17 @@ public:
     bool setDNA(std::string const&);
 
     /*!
+<<<<<<< HEAD
      * @brief Set new output file
      *
      * @param filename output filename (has to be @em fasta)
      * @return checkFile(filename, ".fasta") return value @see Interface::checkFile()
+=======
+     *  Function 4
+     *  param double 
+     *  We only accept negative values, everthing above 0 sets (or resets) mSetThresh to false which 
+     *	means that we reset mThreshold to default value.)
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
      */
     bool setOut(std::string const&);
 
@@ -84,12 +91,20 @@ public:
      */
     bool setPWM();
 
+<<<<<<< HEAD
     /*!
      * @brief To set if we print output on terminal or not.
      *
      * @param pr true we print ouptut on terminal \n false we don't 
      */
     void setPrintOnTerminal(bool) noexcept;
+=======
+	/*!
+	 *  Function 7
+	 *  calculates output from DNA and PWM
+	 */
+    void output();
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 
     /*!
      * @brief Set new PWM
@@ -116,6 +131,7 @@ public:
 	void setThreshToDefault() noexcept;
 
 	/*!
+<<<<<<< HEAD
 	 * @brief Check fstream and filename
 	 *
 	 * @param filename name of a file
@@ -128,23 +144,37 @@ public:
 private:
 	/*!
 	 * @brief Check all files & streams
+=======
+	 * private function 1
+	 * Checks the streams of DNA, PWM and Output files
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 	 */
     void checkFiles() const;
 
     /*!
+<<<<<<< HEAD
      * @brief Iterate on DNA (reads dnafile and updates fragments)
      *
      * Function called in Interface::output()
+=======
+     * private function 2
+     * Reads DNA and sets the score calculation
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
      */
 	void readDNA();
 
     /*!
+<<<<<<< HEAD
      * @brief Calculate dna fragment scores using PWM
      *
      * @param sd dna fragment and all data @see SeqData
 	 * @return true if SeqData's score > threshold
      *
      * function called in Interface::readDNA()
+=======
+     * private function 3
+     * calculates the scores and stores output data
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
      */
 	bool readPWM(SeqData&);
 

@@ -3,7 +3,14 @@
 #include <iostream>
 #include <stdexcept>
 
+<<<<<<< HEAD
 size_t DNA::start(const std::string& filepath) noexcept
+=======
+/*
+ * We need to call the following function each time we initialize a new DNA. (Or if we want to reset one)
+ */
+void DNA::start(const std::string& filepath)
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
 {
     mFileStream.close();
 	mFileStream.open(filepath);
@@ -18,9 +25,25 @@ size_t DNA::start(const std::string& filepath) noexcept
     return static_cast<size_t>(end_pos);
 }
 
+<<<<<<< HEAD
 const std::string DNA::rv() const noexcept
 {
     std::string Rv("");
+=======
+/*
+ * Core function. The following function changes the DNA fragments. 
+ * It is designed to be called in an iterator. 
+ */
+bool DNA::next(const size_t& size)
+{
+    char nChar;
+    mFileStream >> nChar;
+    if (nChar == '>') nextStrand(size); //In this condition we update header.
+    else add(nChar); //Otherwise we update mFwd.
+    
+    checkSeq(); //Checks the characters in mFwd.
+    mRv = "";
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
     for(auto& base: mFwd) {
         if(base == 'A') Rv = "T" + Rv;
         if(base == 'T') Rv = "A" + Rv;
@@ -35,6 +58,7 @@ bool DNA::next(const size_t& size)
     if (!mFileStream.is_open()) {
         throw std::runtime_error("DNA file is not open !");
     }
+<<<<<<< HEAD
     char rChar;
     mFileStream >> std::ws >> rChar;
     if (rChar == '>' or rChar == '<') {
@@ -47,12 +71,18 @@ bool DNA::next(const size_t& size)
     }
 
     checkSeq();
+=======
+    if (mHeader == "") {
+    	throw std::runtime_error("We expected header in DNA file !");
+    }
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
     if (mFwd.length() != size) return false;
     return true;
 }
 
 void DNA::nextStrand(const size_t& size)
 {
+<<<<<<< HEAD
     mHeader = "";
     size_t i(0);
     for (char c('\0'); mFileStream.peek() != '\n' and mFileStream.peek() != ' ' and mFileStream.peek() != '\t' and !mFileStream.eof(); ++i) {
@@ -69,6 +99,23 @@ void DNA::nextStrand(const size_t& size)
     }
     if (mFileStream.peek() != '\n' && !mFileStream.eof()) {
         std::cerr << "In DNA; expected \\n after header !" << std::endl;
+=======
+    mFileStream >> mHeader;
+    if (mFileStream.peek() != '\n') {
+    	throw std::runtime_error("In DNA; we expected \\n after header ! Wrong file format !");
+    }
+    mFwd = "";
+    getPartOfLine(size);
+}
+
+//updates mFwd. -> better performances if we use deques/queues ?
+void DNA::add(const char c)
+{
+    std::string str("");
+    str += c;
+    for (size_t i(1); i < mFwd.size(); ++i) {
+    	mFwd[i-1] = mFwd[i];
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
     }
 
     getPartOfLine(size);
@@ -76,12 +123,19 @@ void DNA::nextStrand(const size_t& size)
 
 std::ifstream& DNA::getPartOfLine(const size_t& size)
 {
+<<<<<<< HEAD
 	mFwd = "";
     for (char rChar; mFwd.length() != size && !mFileStream.eof();) {
         mFileStream >> std::ws >> rChar;
         mFileStream >> std::ws;
         if (rChar == '<' or rChar == '>') {
             nextStrand(size); //recursion
+=======
+    for (char nChar('\0'); (mFwd.length() != size) and (!mFileStream.eof());) {
+        mFileStream >> nChar;
+        if (nChar == '>') {
+            nextStrand(size); //recursion.
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
             return mFileStream;
         }
         else if (rChar != '\0') mFwd += rChar;
@@ -106,3 +160,22 @@ void DNA::checkSeq()
     }
 }
 
+<<<<<<< HEAD
+=======
+void newIfstream::open(const std::string& filename) 
+{
+    mFileStream.open(filename, std::ios::in);
+    mCPos = 0;
+}
+
+/*
+ * I wanted to use inheritance from ifstream but the following function was never called..
+ */
+template<typename T>
+std::ifstream& operator>>(newIfstream& file, T& sth) 
+{
+    file.mFileStream >> std::ws >> sth;
+    ++file.mCPos;
+    return file.mFileStream;
+}
+>>>>>>> 144d52dedad94a311f5f5b9b22a2c3cad37aaadb
